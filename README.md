@@ -28,3 +28,42 @@ You can also put this source in the `requirements.txt`.
 # requirements.txt
 git+https://github.com/anuponwa/datautils.git@1.0.0
 ```
+
+## Usage
+
+`datautils` provides (as of version 1.0.0) 2 sub-packages: google and azure. Depending on where you want to interact, import your sub-package of choice.
+
+### Google
+
+```python
+from datautils.google import get_secret, gcs_to_file
+
+
+# Load secret key and get the secret to access GCS
+with open('secrets/secret-manager-key.json', 'r') as f:
+    secret_info = json.load(f)
+
+secret = get_secret(secret_info, project_id='my-secret-project-id', secret_id='gcs-secret-id-dev')
+
+# Download the content from GCS
+gcspath = 'gs://my-ai-bucket/my-path-to-json.json'
+f = gcs_to_file(gcspath, secret=secret)
+my_dict = json.load(f)
+```
+
+### Azure
+
+```python
+from datautils.azure import databricks_to_df
+
+
+# Load secret key and get the secret to access GCS
+with open('secrets/secret-manager-key.json', 'r') as f:
+    secret_info = json.load(f)
+
+secret = get_secret(secret_info, project_id='my-secret-project-id', secret_id='databricks-secret-id-dev')
+
+# Download from Databricks sql
+query = 'select * from datadev.dsplayground.my_table'
+df = databricks_to_df(query, secret, polars=False)
+```
