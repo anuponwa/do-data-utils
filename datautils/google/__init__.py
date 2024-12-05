@@ -2,7 +2,7 @@
 """
     google sub-package
     ~~~~
-    Provides to all the useful functionalities in Google.
+    Provides to all the useful functionalities and allows you to interact with GCP.
 """
 
 from .gcputils import (
@@ -11,6 +11,5 @@ from .gcputils import (
     gcs_listdirs,
     gcs_listfiles,
     gcs_to_dict,
-    gcs_to_file,
-    set_gcs_client
+    gcs_to_file
 )

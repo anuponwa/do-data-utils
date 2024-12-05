@@ -29,7 +29,13 @@ You can also put this source in the `requirements.txt`.
 git+https://github.com/anuponwa/datautils.git@1.0.0
 ```
 
-## Usage
+## Available Subpackages
+- `google` – Utilities for Google Cloud Platform.
+- `azure` – Utilities for Azure services.
+
+For a full list of functions, see the [overview documentation](docs/overview.md).
+
+## Example Usage
 
 `datautils` provides (as of version 1.0.0) 2 sub-packages: google and azure. Depending on where you want to interact, import your sub-package of choice.
 
@@ -51,7 +57,7 @@ f = gcs_to_file(gcspath, secret=secret)
 my_dict = json.load(f)
 ```
 
-### Azure
+### Azure/Databricks
 
 ```python
 from datautils.azure import databricks_to_df

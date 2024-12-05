@@ -38,7 +38,24 @@ def authen_databrick_sql(secret: dict):
     return cnxn
 
 
-def databricks_to_df(query: str, secret: dict, polars=False):
+def databricks_to_df(query: str, secret: dict, polars: bool=False):
+    """ Retrieve the data from Databricks SQL in a DataFrame
+    Parameters
+    ----------
+    query: str
+        SQL query to retrive data from Databricks.
+
+    secret: dict
+        A secret dictionary used to authenticate to Databricks server.
+
+    polars: bool (Default=False)
+        If polars is True, the function returns polars.DataFrame (only if polars is installed in the environment)
+
+    Returns
+    -------
+    DataFrame (pandas or polars)
+    """
+
     with authen_databrick_sql(secret=secret) as conn:
         if polars:
             try:
