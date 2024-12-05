@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+"""
+    google sub-package
+    ~~~~
+    Provides to all the useful functionalities in Google.
+"""
+
 from .gcputils import (
     get_secret,
     gcs_exists,
