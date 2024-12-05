@@ -48,8 +48,8 @@ def databricks_to_df(query: str, secret: dict, polars: bool=False):
     secret: dict
         A secret dictionary used to authenticate to Databricks server.
 
-    polars: bool (Default=False)
-        If polars is True, the function returns polars.DataFrame (only if polars is installed in the environment)
+    polars: bool, default=False
+        If polars is True, the function returns polars.DataFrame (only if polars is installed in the environment).
 
     Returns
     -------
