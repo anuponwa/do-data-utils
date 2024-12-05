@@ -1,5 +1,15 @@
 # Change Log
 
+## 1.1.0
+Added support for GBQ and GCS functions
+## GBQ
+* `gbq_to_df()` function
+* `df_to_gbq()` function
+
+## GCS
+* Download .csv or .xlsx in GCS to DataFrame
+* Upload related functions, e.g., `df_to_gcs()`, `dict_to_json_gcs()`
+
 ## 1.0.0
 
 ### First version
