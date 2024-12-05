@@ -30,7 +30,7 @@ setup(
     ],
     extras_require={
         'azure': [
-            'databricks-sdk==0.36.0'
+            'databricks-sdk==0.36.0',
             'databricks-sql-connector==3.6.0'
         ],
     },
