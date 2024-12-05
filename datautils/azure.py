@@ -1,7 +1,7 @@
 from databricks import sql
 from databricks.sdk.core import Config, oauth_service_principal
 import pandas as pd
-import polars as pl
+import warnings
 
 
 def authen_databrick_sql(secret: dict):
@@ -16,13 +16,13 @@ def authen_databrick_sql(secret: dict):
     Connection
     """
     
-    server_nm = secret["server_nm"]
-    http_path = secret["http_path"]
-    client_id = secret["client_id"]
-    client_secret = secret["client_secret"]
+    server_nm = secret['server_nm']
+    http_path = secret['http_path']
+    client_id = secret['client_id']
+    client_secret = secret['client_secret']
 
     config = Config(
-      host          = f"https://{server_nm}",
+      host          = f'https://{server_nm}',
       client_id     = client_id,
       client_secret = client_secret
     )
@@ -44,7 +44,7 @@ def databricks_to_df(query: str, databricks_secret: dict, polars=False):
             try:
                 import polars as pl
             except ImportError:
-                print("Polars not installed. Falling back to pandas.")
+                warnings.warn('Polars not installed. Falling back to pandas.')
                 polars = False
 
         if polars:

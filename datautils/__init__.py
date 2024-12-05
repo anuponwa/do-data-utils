@@ -6,6 +6,8 @@
     datautils also comes with common data cleaning functions.
 """
 
+import warnings
+
 
 from .google import (
     get_secret,
@@ -20,4 +22,4 @@ from .google import (
 try:
     from .azure import authen_databrick_sql, databricks_to_df
 except:
-    raise ImportError('Azure utilities not imported. If you want to use them, please install them via: pip install "git+https://github.com/anuponwa/datautils.git@<version>#egg=datautils[azure]"')
+    warnings.warn('Azure utilities not imported. If you want to use them, please install them via: pip install "git+https://github.com/anuponwa/datautils.git@<version>#egg=datautils[azure]"')
