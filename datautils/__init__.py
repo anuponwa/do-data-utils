@@ -8,7 +8,7 @@
 
 import warnings
 
-
+from version import __version__
 import google
 
 try:

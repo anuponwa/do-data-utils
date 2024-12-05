@@ -1,5 +1,5 @@
 import os
-from setuptools import setup
+from setuptools import setup, find_packages
 import sys
 
 # Dynamically import __version__ at execution time
@@ -15,7 +15,7 @@ setup(
     url='https://github.com/anuponwa/datautils',
     author='Anupong Wannakrairot',
     description='Functionalities to connect to different cloud sources and clean data',
-    packages=['datautils'],
+    packages=find_packages(),
     install_requires=[
         'google==3.0.0',
         'google-api-core==2.21.0',
