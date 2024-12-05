@@ -41,6 +41,8 @@ For a full list of functions, see the [overview documentation](docs/overview.md)
 
 ### Google
 
+## GCS
+
 ```python
 from datautils.google import get_secret, gcs_to_file
 
@@ -55,6 +57,23 @@ secret = get_secret(secret_info, project_id='my-secret-project-id', secret_id='g
 gcspath = 'gs://my-ai-bucket/my-path-to-json.json'
 f = gcs_to_file(gcspath, secret=secret)
 my_dict = json.load(f)
+```
+
+## GBQ
+
+```python
+from datautils.google import get_secret, gbq_to_df
+
+
+# Load secret key and get the secret to access GCS
+with open('secrets/secret-manager-key.json', 'r') as f:
+    secret_info = json.load(f)
+
+secret = get_secret(secret_info, project_id='my-secret-project-id', secret_id='gbq-secret-id-dev')
+
+# Query
+query = 'select * from my-project.my-dataset.my-table'
+df = gbq_to_df(query, secret, polars=False)
 ```
 
 ### Azure/Databricks

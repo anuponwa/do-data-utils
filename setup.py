@@ -29,5 +29,7 @@ setup(
         'google-cloud-storage==2.18.2',
         'google-crc32c==1.6.0',
         'pandas',
+        'openpyxl==3.1.5',
+        'XlsxWriter==3.2.0',
     ]
 )
