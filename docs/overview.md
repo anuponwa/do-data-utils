@@ -1,6 +1,7 @@
 # Subpackage: `google`
 Utilities for interacting with Google Cloud
 
+
 ## Common
 - `get_secret(secret_info: dict, project_id: str, secret_id: str, version_id='latest')` – Retrive secret info from Google Secret Manager
 
