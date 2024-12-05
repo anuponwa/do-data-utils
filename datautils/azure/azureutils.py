@@ -38,8 +38,8 @@ def authen_databrick_sql(secret: dict):
     return cnxn
 
 
-def databricks_to_df(query: str, databricks_secret: dict, polars=False):
-    with authen_databrick_sql(databricks_secret=databricks_secret) as conn:
+def databricks_to_df(query: str, secret: dict, polars=False):
+    with authen_databrick_sql(secret=secret) as conn:
         if polars:
             try:
                 import polars as pl
