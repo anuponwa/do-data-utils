@@ -17,6 +17,8 @@ setup(
     description='Functionalities to connect to different cloud sources and clean data',
     packages=find_packages(),
     install_requires=[
+        'databricks-sdk==0.36.0',
+        'databricks-sql-connector==3.6.0',
         'google==3.0.0',
         'google-api-core==2.21.0',
         'google-auth==2.35.0',
@@ -26,12 +28,6 @@ setup(
         'google-cloud-secret-manager==2.21.0',
         'google-cloud-storage==2.18.2',
         'google-crc32c==1.6.0',
-        'pandas'
-    ],
-    extras_require={
-        'azure': [
-            'databricks-sdk==0.36.0',
-            'databricks-sql-connector==3.6.0'
-        ],
-    },
+        'pandas',
+    ]
 )
