@@ -1,7 +1,6 @@
 # Subpackage: `google`
 Utilities for interacting with Google Cloud
 
-
 ## Common
 - `get_secret(secret_info: dict, project_id: str, secret_id: str, version_id='latest')` – Retrive secret info from Google Secret Manager
 
@@ -20,6 +19,7 @@ Utilities for interacting with Google Cloud
 ## GBQ related
 - `gbq_to_df(query: str, secret: dict, polars: bool=False)` – Retrieve the data from Google Bigquery to a DataFrame
 - `df_to_gbq(df, gbq_tb: str, secret: dict, if_exists: str='fail', table_schema=None)` – Uploads a pandas.DataFrame to Google Bigquery
+
 
 # Subpackage: `azure`
 Utilities for interacting with Azure

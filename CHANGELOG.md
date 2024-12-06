@@ -1,5 +1,12 @@
 # Change Log
 
+## 1.1.2
+Update instructions
+
+## 1.1.1
+* Changed to do-data-utils
+* Published to PyPI
+
 ## 1.1.0
 Added support for GBQ and GCS functions
 ### GBQ
