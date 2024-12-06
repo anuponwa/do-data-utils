@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 setup(
     name='do-data-utils',
     version='1.1.0',
-    url='https://github.com/anuponwa/datautils',
+    url='https://github.com/anuponwa/do-data-utils',
     author='Anupong Wannakrairot',
     description='Functionalities to interact with Google and Azure, and clean data',
     packages=find_packages(),
