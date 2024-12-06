@@ -3,10 +3,12 @@ from setuptools import setup, find_packages
 
 setup(
     name='do-data-utils',
-    version='1.1.0',
+    version='1.1.1',
     url='https://github.com/anuponwa/do-data-utils',
     author='Anupong Wannakrairot',
     description='Functionalities to interact with Google and Azure, and clean data',
+    long_description=open('README.md').read(),
+    long_description_content_type='text/markdown',
     packages=find_packages(),
     install_requires=[
         'databricks-sdk==0.36.0',
@@ -26,7 +28,7 @@ setup(
     ],
     classifiers=[
         # Project maturity
-        'Development Status :: 4 - Beta',  # Change to 4-Beta if still in testing
+        'Development Status :: 4 - Beta',
 
         # Intended audience
         'Intended Audience :: Developers',
@@ -45,10 +47,6 @@ setup(
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',  # General Python 3 support
         'Programming Language :: Python :: 3.12',
-
-        # Framework
-        'Framework :: Azure',
-        'Framework :: Google',
 
         # Operating systems
         'Operating System :: OS Independent',

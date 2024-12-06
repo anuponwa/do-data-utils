@@ -8,15 +8,15 @@ This package provides you the functionalities to connect to different cloud sour
 
 To install the latest version from `main` branch, use the following command:
 ```bash
-pip install "git+https://github.com/anuponwa/datautils.git"
+pip install do-data-utils
 ```
 You can install a specific version like so:
 ```bash
-pip install "git+https://github.com/anuponwa/datautils.git@<version>"
+pip install do-data-utils==<version>
 ```
 For example,
 ```bash
-pip install "git+https://github.com/anuponwa/datautils.git@1.1.0"
+pip install do-data-utils==1.1.2
 ```
 
 Extra options can be inspected in `setup.py` in the `extras_require` option.
@@ -26,7 +26,7 @@ Extra options can be inspected in `setup.py` in the `extras_require` option.
 You can also put this source in the `requirements.txt`.
 ```python
 # requirements.txt
-git+https://github.com/anuponwa/datautils.git@1.1.0
+do-data-utils==1.1.2
 ```
 
 ## Available Subpackages
@@ -43,7 +43,7 @@ For a full list of functions, see the [overview documentation](docs/overview.md)
 ## GCS
 
 ```python
-from datautils.google import get_secret, gcs_to_file
+from do_data_utils.google import get_secret, gcs_to_file
 
 
 # Load secret key and get the secret to access GCS
@@ -61,7 +61,7 @@ my_dict = json.load(f)
 ## GBQ
 
 ```python
-from datautils.google import get_secret, gbq_to_df
+from do_data_utils.google import get_secret, gbq_to_df
 
 
 # Load secret key and get the secret to access GCS
@@ -78,7 +78,7 @@ df = gbq_to_df(query, secret, polars=False)
 ### Azure/Databricks
 
 ```python
-from datautils.azure import databricks_to_df
+from do_data_utils.azure import databricks_to_df
 
 
 # Load secret key and get the secret to access GCS
