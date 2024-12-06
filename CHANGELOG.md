@@ -1,5 +1,8 @@
 # Change Log
 
+## 1.2.1
+* Fix version bug
+
 ## 1.2.0
 * Add `list_secrets()` function to list all the available secrets
 
