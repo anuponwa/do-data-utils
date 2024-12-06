@@ -1,2 +1,9 @@
+# cached and test files
 **/*__pycache__
 **/*.ipynb
+
+# build
+build
+dist
+*.egg
+*.egg-info
