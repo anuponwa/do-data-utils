@@ -1,5 +1,9 @@
 # Change Log
 
+## 2.1.0
+* Add `pathutils` subpackage
+* `add_project_root(levels_up=1)` function adds higher level directory to sys.path
+
 ## 2.0.0
 * Re-design google_secret functions - the project_id will now be inferred from the given secret
 * `list_secrets()` function will now return only the names of the secrets (not their full paths)
