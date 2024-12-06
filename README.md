@@ -16,7 +16,7 @@ pip install "git+https://github.com/anuponwa/datautils.git@<version>"
 ```
 For example,
 ```bash
-pip install "git+https://github.com/anuponwa/datautils.git@1.0.0"
+pip install "git+https://github.com/anuponwa/datautils.git@1.1.0"
 ```
 
 Extra options can be inspected in `setup.py` in the `extras_require` option.
@@ -26,7 +26,7 @@ Extra options can be inspected in `setup.py` in the `extras_require` option.
 You can also put this source in the `requirements.txt`.
 ```python
 # requirements.txt
-git+https://github.com/anuponwa/datautils.git@1.0.0
+git+https://github.com/anuponwa/datautils.git@1.1.0
 ```
 
 ## Available Subpackages
@@ -35,9 +35,8 @@ git+https://github.com/anuponwa/datautils.git@1.0.0
 
 For a full list of functions, see the [overview documentation](docs/overview.md).
 
-## Example Usage
 
-`datautils` provides (as of version 1.0.0) 2 sub-packages: google and azure. Depending on where you want to interact, import your sub-package of choice.
+## Example Usage
 
 ### Google
 
