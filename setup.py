@@ -1,20 +1,12 @@
-import os
 from setuptools import setup, find_packages
-import sys
-
-# Dynamically import __version__ at execution time
-temp_path = os.path.join(os.path.abspath("."), 'datautils')
-sys.path.insert(0, temp_path)
-from version import __version__
-sys.path.pop(0)
 
 
 setup(
-    name="datautils",
-    version=__version__,
+    name='do-data-utils',
+    version='1.1.0',
     url='https://github.com/anuponwa/datautils',
     author='Anupong Wannakrairot',
-    description='Functionalities to connect to different cloud sources and clean data',
+    description='Functionalities to interact with Google and Azure, and clean data',
     packages=find_packages(),
     install_requires=[
         'databricks-sdk==0.36.0',
@@ -31,5 +23,34 @@ setup(
         'pandas',
         'openpyxl==3.1.5',
         'XlsxWriter==3.2.0',
+    ],
+    classifiers=[
+        # Project maturity
+        'Development Status :: 4 - Beta',  # Change to 4-Beta if still in testing
+
+        # Intended audience
+        'Intended Audience :: Developers',
+        'Intended Audience :: Science/Research',
+        'Intended Audience :: Information Technology',
+
+        # Topics (domain of your package)
+        'Topic :: Software Development :: Libraries :: Python Modules',
+        'Topic :: Scientific/Engineering :: Information Analysis',
+        'Topic :: Database :: Database Engines/Servers',  # Since you mentioned working with data sources
+
+        # License (match your chosen license)
+        'License :: OSI Approved :: MIT License',
+
+        # Supported programming languages and Python versions
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 3',  # General Python 3 support
+        'Programming Language :: Python :: 3.12',
+
+        # Framework
+        'Framework :: Azure',
+        'Framework :: Google',
+
+        # Operating systems
+        'Operating System :: OS Independent',
     ]
 )
