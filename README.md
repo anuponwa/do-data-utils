@@ -13,7 +13,7 @@ pip install do-data-utils
 ```
 You can install a specific version, for example,
 ```bash
-pip install do-data-utils==1.2.0
+pip install do-data-utils==2.0.0
 ```
 
 ### Install in requirements.txt
@@ -22,7 +22,7 @@ You can also put this source in the `requirements.txt`.
 ```python
 # requirements.txt
 
-do-data-utils==1.2.0
+do-data-utils==2.0.0
 ```
 
 ## Available Subpackages

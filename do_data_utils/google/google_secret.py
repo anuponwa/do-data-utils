@@ -3,16 +3,17 @@ from google.oauth2 import service_account
 import google_crc32c
 
 
-def get_secret(secret_info: dict, project_id: str, secret_id: str, version_id='latest') -> str:
+def get_secret(secret_id: str, secret: dict, version_id='latest') -> str:
     """
     Parameters
     ----------
-    secret_info: dict
-        A secret dictionary used to authenticate the secret manager
-    project_id: str
-        The GCP project name that holds the secrets
     secret_id: str
         The name of the secret you want to retrieve
+
+    secret: dict
+        A secret dictionary used to authenticate the secret manager
+        The secret must have 'project_id' key
+
     version_id: int or str (Default: 'latest')
         The version of the secret. 'latest' gets the latest updated version.
 
@@ -21,8 +22,10 @@ def get_secret(secret_info: dict, project_id: str, secret_id: str, version_id='l
     A string representation of the secret.
     """
 
-    credentials = service_account.Credentials.from_service_account_info(secret_info)
+    credentials = service_account.Credentials.from_service_account_info(secret)
     client = secretmanager.SecretManagerServiceClient(credentials=credentials)
+
+    project_id = secret['project_id']
 
     # Build the resource name of the secret version.
     name = f'projects/{project_id}/secrets/{secret_id}/versions/{version_id}'
@@ -41,12 +44,13 @@ def get_secret(secret_info: dict, project_id: str, secret_id: str, version_id='l
     return payload
 
 
-def list_secrets(project_id: str, secret_info: dict):
+def list_secrets(secret: dict):
     """List all secrets in the given project.
     Parameters
     ----------
-    project_id: str
-        Google Cloud's project id
+    secret: dict
+        A secret dictionary used to authenticate the secret manager
+        The secret must have 'project_id' key
 
     Returns
     -------
@@ -55,8 +59,10 @@ def list_secrets(project_id: str, secret_info: dict):
     """
 
     # Create the Secret Manager client.
-    credentials = service_account.Credentials.from_service_account_info(secret_info)
+    credentials = service_account.Credentials.from_service_account_info(secret)
     client = secretmanager.SecretManagerServiceClient(credentials=credentials)
+
+    project_id = secret['project_id']
 
     # Build the resource name of the parent project.
     parent = f'projects/{project_id}'
@@ -64,7 +70,9 @@ def list_secrets(project_id: str, secret_info: dict):
     # List all secrets.
     secrets_list = []
     for secret in client.list_secrets(request={'parent': parent}):
-        secrets_list.append(secret.name)
+        secret_name_path = secret.name
+        secret_name = secret_name_path.split('/')[-1]
+        secrets_list.append(secret_name)
 
     return secrets_list
 
