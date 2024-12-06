@@ -1,5 +1,8 @@
 # Change Log
 
+## 1.2.0
+* Add `list_secrets()` function to list all the available secrets
+
 ## 1.1.4
 * Support `'catalog'` key in secret for Azure Databricks
 

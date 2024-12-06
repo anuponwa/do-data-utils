@@ -40,3 +40,32 @@ def get_secret(secret_info: dict, project_id: str, secret_id: str, version_id='l
     payload = response.payload.data.decode('UTF-8')
     return payload
 
+
+def list_secrets(project_id: str, secret_info: dict):
+    """List all secrets in the given project.
+    Parameters
+    ----------
+    project_id: str
+        Google Cloud's project id
+
+    Returns
+    -------
+    list
+        List of secret names
+    """
+
+    # Create the Secret Manager client.
+    credentials = service_account.Credentials.from_service_account_info(secret_info)
+    client = secretmanager.SecretManagerServiceClient(credentials=credentials)
+
+    # Build the resource name of the parent project.
+    parent = f'projects/{project_id}'
+
+    # List all secrets.
+    secrets_list = []
+    for secret in client.list_secrets(request={'parent': parent}):
+        secrets_list.append(secret.name)
+
+    return secrets_list
+
+
