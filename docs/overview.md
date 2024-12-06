@@ -9,6 +9,7 @@ Utilities for interacting with Google Cloud
 - `gcs_listdirs(gcspath: str, secret: dict, subdirs_only=True, trailing_slash=False)` – Lists directories in GCS
 - `gcs_listfiles(gcspath: str, secret: dict, files_only=True)` – List files in GCS
 - `gcs_exists(gcspath: str, secret: dict)` – Checks whether the given gcspath exists or not
+- `gcs_to_df(gcspath: str, secret: dict, polars=False, **kwargs)` – Download .csv or .xlsx to DataFrame
 - `gcs_to_dict(gcspath: str, secret: dict)` – Downloads a JSON file in GCS to a dictionary
 - `gcs_to_file(gcspath: str, secret: dict)` – Downloads a GCS file to IO
 
