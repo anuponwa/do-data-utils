@@ -16,6 +16,10 @@ def add_project_root(levels_up: int=1):
     ----------
     levels_up: int
         Number of directory levels to go up. Defaults to 1.
+
+    Returns
+    -------
+    None
     """
 
     if levels_up < 1 or not isinstance(levels_up, int):
@@ -31,3 +35,6 @@ def add_project_root(levels_up: int=1):
     # Append to sys.path if it's not already included
     if current_dir not in sys.path:
         sys.path.append(current_dir)
+        print(f'{current_dir} has been added in sys.path')
+    else:
+        print(f'{current_dir} already exists in sys.path')

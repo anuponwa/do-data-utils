@@ -1,5 +1,9 @@
 # Change Log
 
+## 2.2.0
+* Add `preprocessing` subpackage
+* Allows you to clean and extract valid citizen ID, email, phones (specific to Thai)
+
 ## 2.1.0
 * Add `pathutils` subpackage
 * `add_project_root(levels_up=1)` function adds higher level directory to sys.path

@@ -13,7 +13,7 @@ pip install do-data-utils
 ```
 You can install a specific version, for example,
 ```bash
-pip install do-data-utils==2.1.0
+pip install do-data-utils==2.2.0
 ```
 
 ### Install in requirements.txt
@@ -22,13 +22,14 @@ You can also put this source in the `requirements.txt`.
 ```python
 # requirements.txt
 
-do-data-utils==2.1.0
+do-data-utils==2.2.0
 ```
 
 ## Available Subpackages
 - `google` – Utilities for Google Cloud Platform.
 - `azure` – Utilities for Azure services.
 - `pathutils` – Utilities related to paths.
+- `preprocessing` – Utilities for data preprocessing.
 
 For a full list of functions, see the [overview documentation](docs/overview.md).
 
@@ -133,11 +134,26 @@ query = 'select * from datadev.dsplayground.my_table'
 df = databricks_to_df(query, secret, polars=False)
 ```
 
+
 ### Path utils
+
 ```python
 from do_data_utils.pathutils import add_project_root
 
 # Adds your root folder to sys.path,
 # so you can do imports from the root directory
 add_project_root(levels_up=1)
+```
+
+
+### Preprocessing
+
+```python
+from do_data_utils.preprocessing import clean_phone, clean_citizenid
+
+phone_numbers = '090-123-4567|0912345678|0901234567-9'
+phones_valid = clean_phone(phone_numbers) # Gets the valid phone numbers
+
+citizenid = '0123456789012'
+citizenid_cleaned = clean_citizenid(citizenid)
 ```
