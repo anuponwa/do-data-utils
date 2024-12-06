@@ -31,7 +31,7 @@ do-data-utils==2.2.0
 - `pathutils` – Utilities related to paths.
 - `preprocessing` – Utilities for data preprocessing.
 
-For a full list of functions, see the [overview documentation](docs/overview.md).
+For a full list of functions, see the [overview documentation](https://github.com/anuponwa/do-data-utils/blob/main/docs/overview.md).
 
 
 ## Example Usage
