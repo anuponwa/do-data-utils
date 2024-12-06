@@ -1,6 +1,7 @@
 # do-data-utils
 
 This package provides you the functionalities to connect to different cloud sources and data cleaning functions.
+Package repo on PyPI: [do-data-utils - PyPI](https://pypi.org/project/do-data-utils/)
 
 ## Installation
 
