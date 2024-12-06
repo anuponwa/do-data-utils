@@ -1,5 +1,8 @@
 # Change Log
 
+## 1.1.3
+Update docs
+
 ## 1.1.2
 Update instructions
 
