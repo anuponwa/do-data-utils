@@ -10,6 +10,14 @@ def authen_databrick_sql(secret: dict):
     ----------
     secret: dict
         A secret dictionary used to authenticate to Databricks server.
+        The secret should follow the following format:
+        {
+            'server_nm': 'your-server',
+            'http_path': 'your-http-path',
+            'client_id': 'your-client-id',
+            'client_secret': 'your-client-secret',
+            'catalog': 'your-db-catalog', # [Optional]
+        }
 
     Returns
     -------
@@ -20,6 +28,7 @@ def authen_databrick_sql(secret: dict):
     http_path = secret['http_path']
     client_id = secret['client_id']
     client_secret = secret['client_secret']
+    catalog = secret.get('catalog', None)
 
     config = Config(
       host          = f'https://{server_nm}',
@@ -29,11 +38,19 @@ def authen_databrick_sql(secret: dict):
     
     credential_provider = lambda: oauth_service_principal(config)
     
-    cnxn =  sql.connect(
- 	        server_hostname = server_nm,
- 	        http_path       = http_path,
- 	        credentials_provider = credential_provider
-    )
+    if catalog:
+        cnxn =  sql.connect(
+                server_hostname = server_nm,
+                http_path       = http_path,
+                credentials_provider = credential_provider,
+                catalog = catalog
+        )
+    else:
+        cnxn =  sql.connect(
+                server_hostname = server_nm,
+                http_path       = http_path,
+                credentials_provider = credential_provider
+        )
     
     return cnxn
 
