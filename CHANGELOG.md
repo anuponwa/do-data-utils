@@ -1,5 +1,8 @@
 # Change Log
 
+## 1.1.4
+* Support `'catalog'` key in secret for Azure Databricks
+
 ## 1.1.3
 Update docs
 
