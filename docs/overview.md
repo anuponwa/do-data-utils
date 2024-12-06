@@ -3,6 +3,7 @@ Utilities for interacting with Google Cloud
 
 ## Common
 - `get_secret(secret_info: dict, project_id: str, secret_id: str, version_id='latest')` – Retrive secret info from Google Secret Manager
+- `list_secrets(project_id: str, secret_info: dict)` – List all the available secrets in a `project_id`
 
 ## GCS related
 ### Downloading and checking files

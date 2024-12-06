@@ -5,7 +5,7 @@
     Provides to all the useful functionalities and allows you to interact with GCP.
 """
 
-from .google_secret import get_secret
+from .google_secret import get_secret, list_secrets
 
 from .gcputils import (
     gcs_exists,
