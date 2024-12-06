@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='do-data-utils',
-    version='2.1.0',
+    version='2.2.0',
     url='https://github.com/anuponwa/do-data-utils',
     author='Anupong Wannakrairot',
     description='Functionalities to interact with Google and Azure, and clean data',

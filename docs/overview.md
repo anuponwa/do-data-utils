@@ -33,3 +33,10 @@ Utilities for interacting with Azure
 Utilities related to paths
 
 - `add_project_root(levels_up: int=1)` – Appends the project root directory to sys.path
+
+# Subpackage: `preprocessing`
+Utilities for data preprocessing
+
+- `clean_citizenid(id_str: str)` – Cleans the given 13-digit ID
+- `clean_email(email: str)` – Cleans the e-mail
+- `clean_phone(phone: str, exclude_numbers: Optional[list]=None)` – Cleans phone numbers and outputs a list of valid phone numbers
