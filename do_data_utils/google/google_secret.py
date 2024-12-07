@@ -1,29 +1,66 @@
 from google.cloud import secretmanager
 from google.oauth2 import service_account
 import google_crc32c
+import json
+from typing import Union
+from .common import get_secret_info
 
 
-def get_secret(secret_id: str, secret: dict, version_id='latest') -> str:
+# ----------------
+# Helper functions
+# ----------------
+
+def set_secret_manager_client(secret: Union[dict, str]):
+    """Gets a secret manager client
+    Parameters
+    ----------
+    secret: dict | str
+        A secret dictionary used to authenticate the secret manager
+        or a path to the secret.json file.
+
+    Returns
+    -------
+    Tuple[client, dict]
+        A tuple of secret manager and the dictionary of the secret.
+    """
+
+    secret = get_secret_info(secret)
+    credentials = service_account.Credentials.from_service_account_info(secret)
+    client = secretmanager.SecretManagerServiceClient(credentials=credentials)
+    
+    return client, secret
+
+
+# ----------------
+# Utils functions
+# ----------------
+
+def get_secret(secret_id: str, secret: Union[dict, str], as_json: bool=False, version_id: Union[str, int]='latest') -> Union[str, dict]:
     """
     Parameters
     ----------
     secret_id: str
         The name of the secret you want to retrieve
 
-    secret: dict
+    secret: dict | str
         A secret dictionary used to authenticate the secret manager
-        The secret must have 'project_id' key
+        or a path to the secret.json file.
+        The secret must have 'project_id' key.
 
-    version_id: int or str (Default: 'latest')
+    as_json: bool, default=False
+        Indicates whether or not the secret is in the JSON format
+        and you would like to return as a dictionary.
+
+    version_id: str | int, default='latest'
         The version of the secret. 'latest' gets the latest updated version.
 
     Returns
     -------
-    A string representation of the secret.
+    str | dict
+        Secret string or dictionary.
     """
 
-    credentials = service_account.Credentials.from_service_account_info(secret)
-    client = secretmanager.SecretManagerServiceClient(credentials=credentials)
+    client, secret = set_secret_manager_client(secret=secret)
 
     project_id = secret['project_id']
 
@@ -41,26 +78,33 @@ def get_secret(secret_id: str, secret: dict, version_id='latest') -> str:
         raise Exception('Data corruption detected.')
 
     payload = response.payload.data.decode('UTF-8')
+
+    if as_json:
+        try:
+            return json.loads(payload)
+        except json.JSONDecodeError as e:
+            raise ValueError(f'Faled to parse secret as JSON: {e}')
+        
     return payload
 
 
-def list_secrets(secret: dict):
+def list_secrets(secret: Union[dict, str]):
     """List all secrets in the given project.
     Parameters
     ----------
-    secret: dict
+    secret: dict | str
         A secret dictionary used to authenticate the secret manager
-        The secret must have 'project_id' key
+        or a path to the secret.json file.
+        The secret must have 'project_id' key.
 
     Returns
     -------
     list
-        List of secret names
+        List of secret names.
     """
 
     # Create the Secret Manager client.
-    credentials = service_account.Credentials.from_service_account_info(secret)
-    client = secretmanager.SecretManagerServiceClient(credentials=credentials)
+    client, secret = set_secret_manager_client(secret=secret)
 
     project_id = secret['project_id']
 
