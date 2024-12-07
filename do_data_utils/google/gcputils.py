@@ -3,30 +3,36 @@ from google.oauth2 import service_account
 import io
 import json
 import pandas as pd
+from typing import Union
 import warnings
+from .common import get_secret_info
 
 
 # ----------------
 # Helper functions
 # ----------------
 
-def set_gcs_client(secret: dict):
-    """
+def set_gcs_client(secret: Union[dict, str]):
+    """Set GCS client based on the given `secret`
     Parameters
     ----------
-    secret: dict
-        A secret dictionary used to authenticate the GCS.
+    secret: dict | str
+        A secret dictionary used to authenticate the GCS
+        or a path to the secret.json file.
 
     Returns
     -------
     storage.Client
     """
 
+    secret = get_secret_info(secret)
     credentials = service_account.Credentials.from_service_account_info(secret)
-    return storage.Client(credentials=credentials)
+    client = storage.Client(credentials=credentials)
+
+    return client
 
 
-def io_to_gcs(io_output, gcspath: str, secret: dict):
+def io_to_gcs(io_output, gcspath: str, secret: Union[dict, str]):
     """Uploads IO to GCS
     
     Parameters
@@ -37,8 +43,9 @@ def io_to_gcs(io_output, gcspath: str, secret: dict):
     gcspath: str
         GCS path that starts with 'gs://'.
 
-    secret: dict
-        A secret dictionary used to authenticate the GCS.
+    secret: dict | str
+        A secret dictionary used to authenticate the GCS
+        or a path to the secret.json file.
 
     Returns
     -------
@@ -53,7 +60,7 @@ def io_to_gcs(io_output, gcspath: str, secret: dict):
     blob.upload_from_file(io_output)
         
 
-def str_to_gcs(str_output: str, gcspath: str, secret: dict):
+def str_to_gcs(str_output: str, gcspath: str, secret: Union[dict, str]):
     """Uploads string to GCS
     
     Parameters
@@ -64,8 +71,9 @@ def str_to_gcs(str_output: str, gcspath: str, secret: dict):
     gcspath: str
         GCS path that starts with 'gs://'.
         
-    secret: dict
-        A secret dictionary used to authenticate the GCS.
+    secret: dict | str
+        A secret dictionary used to authenticate the GCS
+        or a path to the secret.json file.
 
     Returns
     -------
@@ -79,7 +87,7 @@ def str_to_gcs(str_output: str, gcspath: str, secret: dict):
     blob.upload_from_string(str_output)
 
 
-def df_to_excel_gcs(df, gcspath, secret, **kwargs):
+def df_to_excel_gcs(df, gcspath: str, secret: Union[dict, str], **kwargs):
     """Saves a pandas.DataFrame as an Excel file and uploads to GCS
     
     Parameters
@@ -90,8 +98,9 @@ def df_to_excel_gcs(df, gcspath, secret, **kwargs):
     gcspath: str
         GCS path that starts with 'gs://' and ends with 'xlsx'.
 
-    secret: dict
-        A secret dictionary used to authenticate the GCS.
+    secret: dict | str
+        A secret dictionary used to authenticate the GCS
+        or a path to the secret.json file.
 
     Returns
     -------
@@ -105,7 +114,7 @@ def df_to_excel_gcs(df, gcspath, secret, **kwargs):
     io_to_gcs(output, gcspath, secret=secret)
 
 
-def gcs_to_file(gcspath: str, secret: dict):
+def gcs_to_file(gcspath: str, secret: Union[dict, str]):
     """Downloads a GCS file to IO
     
     Parameter
@@ -113,8 +122,9 @@ def gcs_to_file(gcspath: str, secret: dict):
     gcspath: str
         GCS path to your file.
 
-    secret: dict
-        A secret dictionary used to authenticate GCS.
+    secret: dict | str
+        A secret dictionary used to authenticate GCS
+        or a path to the secret.json file.
         
     Returns
     -------
@@ -136,7 +146,7 @@ def gcs_to_file(gcspath: str, secret: dict):
 # Util functions
 # ----------------
 
-def gcs_listfiles(gcspath: str, secret: dict, files_only=True):
+def gcs_listfiles(gcspath: str, secret: Union[dict, str], files_only=True):
     """Lists files in a GCS directory
     
     Parameters
@@ -144,8 +154,9 @@ def gcs_listfiles(gcspath: str, secret: dict, files_only=True):
     gcspath: str
         GCS path starting with 'gs://'.
 
-    secret: dict
-        A secret dictionary used to authenticate the GCS.
+    secret: dict | str
+        A secret dictionary used to authenticate the GCS
+        or a path to the secret.json file.
         
     files_only: bool, default=True
         Whether to output only the file inside the given path, or output the whole path.
@@ -181,7 +192,7 @@ def gcs_listfiles(gcspath: str, secret: dict, files_only=True):
     return file_list
 
 
-def gcs_listdirs(gcspath: str, secret: dict, subdirs_only=True, trailing_slash=False):
+def gcs_listdirs(gcspath: str, secret: Union[dict, str], subdirs_only=True, trailing_slash=False):
     """Lists directories in GCS
     
     Parameters
@@ -189,8 +200,9 @@ def gcs_listdirs(gcspath: str, secret: dict, subdirs_only=True, trailing_slash=F
     gcspath: str
         GCS path starting with 'gs://'.
 
-    secret: dict
-        A secret dictionary used to authenticate GCS.
+    secret: dict | str
+        A secret dictionary used to authenticate GCS
+        or a path to the secret.json file.
         
     subdirs_only: bool, default=True
         Whether to output only the directory inside the given path, or output the whole path.
@@ -226,7 +238,7 @@ def gcs_listdirs(gcspath: str, secret: dict, subdirs_only=True, trailing_slash=F
     return dirs
 
 
-def gcs_exists(gcspath: str, secret: dict):
+def gcs_exists(gcspath: str, secret: Union[dict, str]):
     """Checks whether the given gcspath exists or not
     
     Parameter
@@ -234,8 +246,9 @@ def gcs_exists(gcspath: str, secret: dict):
     gcspath: str
         GCS path starting with 'gs://'.
 
-    secret: dict
-        A secret dictionary used to authenticate GCS.
+    secret: dict | str
+        A secret dictionary used to authenticate GCS
+        or a path to the secret.json file.
         
     Returns
     -------
@@ -250,7 +263,7 @@ def gcs_exists(gcspath: str, secret: dict):
     return exists
 
 
-def gcs_to_dict(gcspath: str, secret: dict) -> dict:
+def gcs_to_dict(gcspath: str, secret: Union[dict, str]) -> dict:
     """Downloads a JSON file to a dictionary
     
     Parameter
@@ -258,8 +271,9 @@ def gcs_to_dict(gcspath: str, secret: dict) -> dict:
     gcspath: str
         GCS path to your json (or dict like) file.
 
-    secret: dict
-        A secret dictionary used to authenticate GCS.
+    secret: dict | str
+        A secret dictionary used to authenticate GCS
+        or a path to the secret.json file.
         
     Returns
     -------
@@ -271,7 +285,7 @@ def gcs_to_dict(gcspath: str, secret: dict) -> dict:
     return json.load(f)
 
 
-def gcs_to_df(gcspath: str, secret: dict, polars=False, **kwargs):
+def gcs_to_df(gcspath: str, secret: Union[dict, str], polars=False, **kwargs):
     """Downloads a .csv or.xlsx file to a pandas.DataFrame
     
     Parameters
@@ -279,8 +293,9 @@ def gcs_to_df(gcspath: str, secret: dict, polars=False, **kwargs):
     gcspath: str
         GCS path to your file.
 
-    secret: dict
-        A secret dictionary used to authenticate the GCS.
+    secret: dict | str
+        A secret dictionary used to authenticate the GCS
+        or a path to the secret.json file.
 
     polars: bool, default=False
         If polars is True, the function returns polars.DataFrame (only if polars is installed in the environment).
@@ -327,7 +342,7 @@ def gcs_to_df(gcspath: str, secret: dict, polars=False, **kwargs):
 # Uploading to GCS
 # -----------------
 
-def df_to_gcs(df, gcspath: str, secret: dict, **kwargs):
+def df_to_gcs(df, gcspath: str, secret: Union[dict, str], **kwargs):
     """Saves a pandas.DataFrame (to any file type, e.g., .csv or .xlsx) and uploads to GCS
     
     Parameters
@@ -338,8 +353,9 @@ def df_to_gcs(df, gcspath: str, secret: dict, **kwargs):
     gcspath: str
         GCS path that starts with 'gs://' and ends with your preferred file type such as '.csv' or '.xlsx'.
 
-    secret: dict
-        A secret dictionary used to authenticate the GCS.
+    secret: dict | str
+        A secret dictionary used to authenticate the GCS
+        or a path to the secret.json file.
     
     Returns
     -------
@@ -361,7 +377,7 @@ def df_to_gcs(df, gcspath: str, secret: dict, **kwargs):
         return f'The file has been successfully uploaded to {gcspath}.'
     
 
-def dict_to_json_gcs(dict_data: dict, gcspath: str, secret: dict):
+def dict_to_json_gcs(dict_data: dict, gcspath: str, secret: Union[dict, str]):
     """Uploads a dictionary to a JSON file
     
     Parameters
@@ -372,8 +388,9 @@ def dict_to_json_gcs(dict_data: dict, gcspath: str, secret: dict):
     gcspath: str
         GCS path that starts with 'gs://' and ends with '.json'
 
-    secret: dict
-        A secret dictionary used to authenticate the GCS.
+    secret: dict | str
+        A secret dictionary used to authenticate the GCS
+        or a path to the secret.json file.
 
     Returns
     -------

@@ -1,5 +1,10 @@
 # Change Log
 
+## 2.3.0
+* Add options to pass in the secret file path instead of dict in `get_secret()`
+* Other GBQ and GCS functions also have this option. `secret` can be a type of `dict` or `str` that ends with '.json'
+* Add `as_json` option, (default `as_json=False`) in `get_secret()` to allow backward-compatibility and ease of use to the user in case the secret is in JSON form
+
 ## 2.2.0
 * Add `preprocessing` subpackage
 * Allows you to clean and extract valid citizen ID, email, phones (specific to Thai)

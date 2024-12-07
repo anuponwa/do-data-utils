@@ -1,26 +1,56 @@
 from google.cloud import bigquery
 from google.oauth2 import service_account
+from typing import Union
 import warnings
+from .common import get_secret_info
 
 
 # ----------------
 # Helper functions
 # ----------------
 
-def set_gbq_credentials(secret: dict):
-    credentials = service_account.Credentials.from_service_account_info(secret)
+def set_gbq_credentials(secret: Union[dict, str]):
+    """Set GBQ credentials based on the given `secret`
+    Parameters
+    ----------
+    secret: dict | str
+        A secret dictionary used to authenticate the GBQ
+        or a path to the secret.json file.
+
+    Returns
+    -------
+    GBQ credentials
+    """
+
+    secret_info = get_secret_info(secret)
+    credentials = service_account.Credentials.from_service_account_info(secret_info)
     return credentials
 
-def set_gbq_client(secret: dict):
-    credentials = service_account.Credentials.from_service_account_info(secret)
-    return bigquery.Client(credentials=credentials)
+
+def set_gbq_client(secret: Union[dict, str]):
+    """Set GBQ client based on the given `secret`
+    Parameters
+    ----------
+    secret: dict | str
+        A secret dictionary used to authenticate the Google Bigquery
+        or a path to the secret.json file.
+
+    Returns
+    -------
+    bigquery.CLient
+    """
+
+    secret_info = get_secret_info(secret)
+    credentials = service_account.Credentials.from_service_account_info(secret_info)
+    client = bigquery.Client(credentials=credentials)
+    return client
 
 
 # ----------------
 # Utils functions
 # ----------------
 
-def gbq_to_df(query: str, secret: dict, polars: bool=False):
+def gbq_to_df(query: str, secret: Union[dict, str], polars: bool=False):
     """Executes the `select` query and downloads it as a pandas.DataFrame
     
     Parameter
@@ -28,15 +58,16 @@ def gbq_to_df(query: str, secret: dict, polars: bool=False):
     query: str
         An SQL query to be executed.
         
-    secret: dict
-        A secret dictionary used to authenticate Google Bigquery.
+    secret: dict | str
+        A secret dictionary used to authenticate the Google Bigquery
+        or a path to the secret.json file.
 
     polars: bool, default=False
         If polars is True, the function returns polars.DataFrame (only if polars is installed in the environment).
         
     Returns
     -------
-    DataFrame (pandas or polars)
+    DataFrame (pandas or polars).
     """
 
     client = set_gbq_client(secret=secret)
@@ -55,7 +86,7 @@ def gbq_to_df(query: str, secret: dict, polars: bool=False):
     return df
 
 
-def df_to_gbq(df, gbq_tb: str, secret: dict, if_exists: str='fail', table_schema=None):
+def df_to_gbq(df, gbq_tb: str, secret: Union[dict, str], if_exists: str='fail', table_schema=None):
     """Uploads a pandas.DataFrame to a GBQ table
     
     Parameters
@@ -67,8 +98,9 @@ def df_to_gbq(df, gbq_tb: str, secret: dict, if_exists: str='fail', table_schema
         GBQ table name including the project id and dataset id.
         For example, 'scg-cbm-do-dev-rg.indv_abc.test_table'.
         
-    secret: dict
-        A secret dictionary to authenticate Google Bigquery.
+    secret: dict | str
+        A secret dictionary used to authenticate the Google Bigquery
+        or a path to the secret.json file.
 
     if_exists: str, default='fail'
         What to do if the table already exists.

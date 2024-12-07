@@ -13,7 +13,7 @@ pip install do-data-utils
 ```
 You can install a specific version, for example,
 ```bash
-pip install do-data-utils==2.2.0
+pip install do-data-utils==2.3.0
 ```
 
 ### Install in requirements.txt
@@ -22,7 +22,7 @@ You can also put this source in the `requirements.txt`.
 ```python
 # requirements.txt
 
-do-data-utils==2.2.0
+do-data-utils==2.3.0
 ```
 
 ## Available Subpackages
@@ -53,10 +53,8 @@ from do_data_utils.google import get_secret, gcs_to_df
 
 
 # Load secret key and get the secret to access GCS
-with open('secrets/secret-manager-key.json', 'r') as f:
-    secret_info = json.load(f)
-
-secret = get_secret(secret_info, project_id='my-secret-project-id', secret_id='gcs-secret-id-dev')
+secret_path = 'secrets/secret-manager-key.json'
+secret = get_secret(secret_id='gcs-secret-id-dev', secret=secret_path, as_json=True)
 
 # Download a csv file to DataFrame
 gcspath = 'gs://my-ai-bucket/my-path-to-csv.csv'
@@ -69,10 +67,8 @@ from do_data_utils.google import get_secret, gcs_to_dict
 
 
 # Load secret key and get the secret to access GCS
-with open('secrets/secret-manager-key.json', 'r') as f:
-    secret_info = json.load(f)
-
-secret = get_secret(secret_info, project_id='my-secret-project-id', secret_id='gcs-secret-id-dev')
+secret_path = 'secrets/secret-manager-key.json'
+secret = get_secret(secret_id='gcs-secret-id-dev', secret=secret_path, as_json=True)
 
 # Download the content from GCS
 gcspath = 'gs://my-ai-bucket/my-path-to-json.json'
@@ -85,10 +81,14 @@ from do_data_utils.google import get_secret, dict_to_json_gcs
 
 
 # Load secret key and get the secret to access GCS
+secret_path = 'secrets/secret-manager-key.json'
+
+# No need to read in the secret info from version 2.3.0
 with open('secrets/secret-manager-key.json', 'r') as f:
     secret_info = json.load(f)
 
-secret = get_secret(secret_info, project_id='my-secret-project-id', secret_id='gcs-secret-id-dev')
+# you can pass in either dict or path to JSON in `secret` argument
+secret = get_secret(secret_id='gcs-secret-id-dev', secret=secret_info, as_json=True) 
 
 my_setting_dict = {
     'param1': 'abc',
@@ -96,7 +96,7 @@ my_setting_dict = {
 }
 
 gcspath = 'gs://my-bucket/my-path-to-json.json'
-dict_to_json_gcs(dict_data= my_setting_dict, gcspath=gcspath, secret=secret)
+dict_to_json_gcs(dict_data=my_setting_dict, gcspath=gcspath, secret=secret)
 ```
 
 #### GBQ
@@ -109,7 +109,8 @@ from do_data_utils.google import get_secret, gbq_to_df
 with open('secrets/secret-manager-key.json', 'r') as f:
     secret_info = json.load(f)
 
-secret = get_secret(secret_info, project_id='my-secret-project-id', secret_id='gbq-secret-id-dev')
+# you can pass in either dict or path to JSON in `secret` argument
+secret = get_secret(secret_id='gbq-secret-id-dev', secret=secret_info, as_json=True)
 
 # Query
 query = 'select * from my-project.my-dataset.my-table'
@@ -127,7 +128,7 @@ from do_data_utils.azure import databricks_to_df
 with open('secrets/secret-manager-key.json', 'r') as f:
     secret_info = json.load(f)
 
-secret = get_secret(secret_info, project_id='my-secret-project-id', secret_id='databricks-secret-id-dev')
+secret = get_secret(secret_id='databricks-secret-id-dev', secret=secret_info, as_json=True)
 
 # Download from Databricks sql
 query = 'select * from datadev.dsplayground.my_table'
