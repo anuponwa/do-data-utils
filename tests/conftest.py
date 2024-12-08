@@ -100,3 +100,19 @@ def mock_gbq_client():
         mock_client.return_value = client_instance
         yield client_instance
 
+
+@pytest.fixture
+def mock_gcs_service_account_credentials():
+    with patch("do_data_utils.google.gcputils.service_account.Credentials.from_service_account_info") as mock_client:
+        credentials_instance = MagicMock()
+        mock_client.return_value = credentials_instance
+        yield credentials_instance
+
+
+@pytest.fixture
+def mock_gcs_client():
+    with patch("do_data_utils.google.gcputils.storage.Client") as mock_client:
+        client_instance = MagicMock()
+        mock_client.return_value = client_instance
+        yield client_instance
+

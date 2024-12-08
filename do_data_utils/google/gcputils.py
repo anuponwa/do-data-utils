@@ -61,7 +61,7 @@ def io_to_gcs(io_output, gcspath: str, secret: Union[dict, str]):
     blob.upload_from_file(io_output)
         
 
-def str_to_gcs(str_output: str, gcspath: str, secret: Union[dict, str]):
+def str_to_gcs(str_output: str, gcspath: str, secret: Union[dict, str]) -> None:
     """Uploads string to GCS
     
     Parameters
@@ -88,7 +88,7 @@ def str_to_gcs(str_output: str, gcspath: str, secret: Union[dict, str]):
     blob.upload_from_string(str_output)
 
 
-def df_to_excel_gcs(df, gcspath: str, secret: Union[dict, str], **kwargs):
+def df_to_excel_gcs(df, gcspath: str, secret: Union[dict, str], **kwargs) -> None:
     """Saves a pandas.DataFrame as an Excel file and uploads to GCS
     
     Parameters
@@ -115,7 +115,7 @@ def df_to_excel_gcs(df, gcspath: str, secret: Union[dict, str], **kwargs):
     io_to_gcs(output, gcspath, secret=secret)
 
 
-def gcs_to_file(gcspath: str, secret: Union[dict, str]):
+def gcs_to_file(gcspath: str, secret: Union[dict, str]) -> io.BytesIO:
     """Downloads a GCS file to IO
     
     Parameter
@@ -147,7 +147,7 @@ def gcs_to_file(gcspath: str, secret: Union[dict, str]):
 # Util functions
 # ----------------
 
-def gcs_listfiles(gcspath: str, secret: Union[dict, str], files_only=True):
+def gcs_listfiles(gcspath: str, secret: Union[dict, str], files_only=True) -> list:
     """Lists files in a GCS directory
     
     Parameters
@@ -169,7 +169,7 @@ def gcs_listfiles(gcspath: str, secret: Union[dict, str], files_only=True):
     """
 
     if not gcspath.startswith('gs://'):
-        raise Exception("The path has to start with 'gs://'.")
+        raise ValueError("The path has to start with 'gs://'.")
     if not gcspath.endswith('/'):
         gcspath += '/'
     client = set_gcs_client(secret)
@@ -193,7 +193,7 @@ def gcs_listfiles(gcspath: str, secret: Union[dict, str], files_only=True):
     return file_list
 
 
-def gcs_listdirs(gcspath: str, secret: Union[dict, str], subdirs_only=True, trailing_slash=False):
+def gcs_listdirs(gcspath: str, secret: Union[dict, str], subdirs_only=True, trailing_slash=False) -> list:
     """Lists directories in GCS
     
     Parameters
@@ -218,7 +218,7 @@ def gcs_listdirs(gcspath: str, secret: Union[dict, str], subdirs_only=True, trai
     """
 
     if not gcspath.startswith('gs://'):
-        raise Exception("The path has to start with 'gs://'.")
+        raise ValueError("The path has to start with 'gs://'.")
     if not gcspath.endswith('/'):
         gcspath += '/'
 
@@ -239,7 +239,7 @@ def gcs_listdirs(gcspath: str, secret: Union[dict, str], subdirs_only=True, trai
     return dirs
 
 
-def gcs_exists(gcspath: str, secret: Union[dict, str]):
+def gcs_exists(gcspath: str, secret: Union[dict, str]) -> bool:
     """Checks whether the given gcspath exists or not
     
     Parameter
@@ -313,9 +313,9 @@ def gcs_to_df(gcspath: str, secret: Union[dict, str], polars=False, **kwargs):
     """
 
     if not gcspath.startswith('gs://'):
-        raise Exception("The path has to start with 'gs://'.")
+        raise ValueError("The path has to start with 'gs://'.")
     if not gcspath.endswith('.csv') and not gcspath.endswith('.xlsx'):
-        raise Exception('The file name has to be either .csv or .xlsx or .log file.')
+        raise ValueError('The file name has to be either .csv or .xlsx file.')
         
     if gcspath.endswith('.csv'):
         f = gcs_to_file(gcspath, secret=secret)
