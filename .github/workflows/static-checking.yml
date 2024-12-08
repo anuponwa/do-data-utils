@@ -1,0 +1,27 @@
+name: Static Type Checking
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  release-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Dependencies
+        run: pip install -r requirements_dev.txt
+
+      - name: Run Tests
+        run: mypy do_data_utils --ignore-missing-imports --disable-error-code attr-defined

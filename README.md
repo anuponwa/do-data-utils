@@ -1,5 +1,10 @@
 # do-data-utils
 
+![Static Typed Checks](https://github.com/anuponwa/do-data-utils/actions/workflows/static-checking.yml/badge.svg)
+![Continuous Testing](https://github.com/anuponwa/do-data-utils/actions/workflows/continuous-testing.yml/badge.svg)
+![Release Testing and Tagging](https://github.com/anuponwa/do-data-utils/actions/workflows/continuous-testing.yml/badge.svg)
+![Publish Tag to PyPI](https://github.com/anuponwa/do-data-utils/actions/workflows/publish-tag-to-pypi.yml/badge.svg)
+
 This package provides you the functionalities to connect to different cloud sources and data cleaning functions.
 Package repo on PyPI: [do-data-utils - PyPI](https://pypi.org/project/do-data-utils/)
 
