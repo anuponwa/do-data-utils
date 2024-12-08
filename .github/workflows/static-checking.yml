@@ -1,9 +1,7 @@
-name: Continuous Testing
+name: Static Type Checking
 
 on:
   push:
-    branches-ignore:
-      - 'release/*'
   pull_request:
 
 permissions:
@@ -26,4 +24,4 @@ jobs:
         run: pip install -r requirements_dev.txt
 
       - name: Run Tests
-        run: pytest tests/
+        run: mypy do_data_utils --ignore-missing-imports --disable-error-code attr-defined
