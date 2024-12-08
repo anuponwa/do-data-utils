@@ -4,6 +4,7 @@ from typing import Union
 
 def get_secret_info(secret: Union[dict, str]) -> dict:
     """Gets the secret info
+
     Parameters
     ----------
     secret: dict | str
@@ -25,5 +26,5 @@ def get_secret_info(secret: Union[dict, str]) -> dict:
 
     else:
         raise ValueError('`secret` must be a dictionary or a JSON file path.')
-    
+
     return secret_info

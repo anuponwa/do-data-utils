@@ -11,6 +11,7 @@ from .common import get_secret_info
 
 def set_gbq_credentials(secret: Union[dict, str]):
     """Set GBQ credentials based on the given `secret`
+
     Parameters
     ----------
     secret: dict | str
@@ -29,6 +30,7 @@ def set_gbq_credentials(secret: Union[dict, str]):
 
 def set_gbq_client(secret: Union[dict, str]):
     """Set GBQ client based on the given `secret`
+    
     Parameters
     ----------
     secret: dict | str

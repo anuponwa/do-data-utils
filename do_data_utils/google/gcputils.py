@@ -14,6 +14,7 @@ from .common import get_secret_info
 
 def set_gcs_client(secret: Union[dict, str]):
     """Set GCS client based on the given `secret`
+    
     Parameters
     ----------
     secret: dict | str

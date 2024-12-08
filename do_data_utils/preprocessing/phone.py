@@ -3,8 +3,9 @@ from typing import Optional
 from .constants import EXCLUDE_PHONE_NUMBER_LIST
 
 
-def clean_phone(phone: str, exclude_numbers: Optional[list]=None) -> str:
+def clean_phone(phone: str, exclude_numbers: Optional[list]=None) -> Optional[str]:
     """Cleans phone numbers and outputs a list of valid phone numbers
+    
     Parameters
     ----------
     phone: str
@@ -24,7 +25,7 @@ def clean_phone(phone: str, exclude_numbers: Optional[list]=None) -> str:
 
     Returns
     -------
-    str
+    str | None
         Valid phone number(s), concatnated with `|` character
     """
 
@@ -94,4 +95,4 @@ def clean_phone(phone: str, exclude_numbers: Optional[list]=None) -> str:
                 
     final_phone = '|'.join(final_ret_arr)
     
-    return final_phone
+    return final_phone if final_phone else None

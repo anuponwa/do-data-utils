@@ -5,7 +5,8 @@ import warnings
 
 
 def authen_databrick_sql(secret: dict):
-    """
+    """Authenticates to Databricks SQL server
+
     Parameters
     ----------
     secret: dict
@@ -56,7 +57,8 @@ def authen_databrick_sql(secret: dict):
 
 
 def databricks_to_df(query: str, secret: dict, polars: bool=False):
-    """ Retrieve the data from Databricks SQL in a DataFrame
+    """ Retrieves the data from Databricks SQL in a DataFrame
+
     Parameters
     ----------
     query: str

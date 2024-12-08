@@ -2,7 +2,7 @@ from google.cloud import secretmanager
 from google.oauth2 import service_account
 import google_crc32c
 import json
-from typing import Union
+from typing import Union, Tuple
 from .common import get_secret_info
 
 
@@ -10,8 +10,9 @@ from .common import get_secret_info
 # Helper functions
 # ----------------
 
-def set_secret_manager_client(secret: Union[dict, str]):
+def set_secret_manager_client(secret: Union[dict, str]) -> Tuple[secretmanager.SecretManagerServiceClient, dict[str, str]]:
     """Gets a secret manager client
+
     Parameters
     ----------
     secret: dict | str
@@ -36,14 +37,15 @@ def set_secret_manager_client(secret: Union[dict, str]):
 # ----------------
 
 def get_secret(secret_id: str, secret: Union[dict, str], as_json: bool=False, version_id: Union[str, int]='latest') -> Union[str, dict]:
-    """
+    """Gets secret from Google secret manager
+
     Parameters
     ----------
     secret_id: str
-        The name of the secret you want to retrieve
+        The name of the secret you want to retrieve.
 
     secret: dict | str
-        A secret dictionary used to authenticate the secret manager
+        A secret dictionary used to authenticate the secret manager.
         or a path to the secret.json file.
         The secret must have 'project_id' key.
 
@@ -90,6 +92,7 @@ def get_secret(secret_id: str, secret: Union[dict, str], as_json: bool=False, ve
 
 def list_secrets(secret: Union[dict, str]):
     """List all secrets in the given project.
+
     Parameters
     ----------
     secret: dict | str

@@ -1,10 +1,12 @@
 import functools
 import re
+from typing import Optional
 from .common import search_regexp
 
 
 def get_checksum(id_str: str) -> int:
     """Calculates the checksum of the 13-digit ID
+
     Parameters
     ----------
     id_str: str
@@ -25,6 +27,7 @@ def get_checksum(id_str: str) -> int:
 
 def validate_citizen_id(id_str: str) -> bool:
     """Validates any 13-digit ID if the last digit is equal to its checksum
+
     Parameters
     ----------
     id_str: str
@@ -42,12 +45,13 @@ def validate_citizen_id(id_str: str) -> bool:
 
     
 
-def clean_citizenid(id_str: str) -> str:
+def clean_citizenid(id_str: str) -> Optional[str]:
     """Cleans the given 13-digit ID
+
     Parameters
     ----------
     id_str: str
-        13-digit ID
+        13-digit ID (can have spaces or dashes/hyphens('-'))
 
     Returns
     -------

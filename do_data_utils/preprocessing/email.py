@@ -1,8 +1,10 @@
+from typing import Optional
 from .common import search_regexp
 
 
-def clean_email(email: str) -> str:
+def clean_email(email: str) -> Optional[str]:
     """Cleans the e-mail
+    
     Parameters
     ----------
     email: str
