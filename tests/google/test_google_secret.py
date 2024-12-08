@@ -33,7 +33,6 @@ def test_get_secret_json(mock_secret_manager_client, mock_secret_service_account
     )
 
 
-
 def test_list_secrets(mock_secret_manager_client, mock_secret_service_account_credentials, secret_json_dict):
     # Arrange: Mock the client and `list_secrets` behavior
     mock_secret1 = MagicMock()

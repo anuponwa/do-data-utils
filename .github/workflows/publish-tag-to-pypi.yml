@@ -26,7 +26,14 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Install Dependencies
+        run: pip install -r requirements_dev.txt
+  
+      - name: Run Tests
+        run: mypy do_data_utils --ignore-missing-imports --disable-error-code attr-defined
+
       - name: Build release distributions
+        if: ${{ success() }}
         run: |
           # NOTE: put your own distribution build steps here.
           python -m pip install setuptools wheel twine
@@ -34,6 +41,7 @@ jobs:
 
 
       - name: Publish to PyPI
+        if: ${{ success() }}
         env:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
