@@ -2,7 +2,6 @@
 
 ![Static Typed Checks](https://github.com/anuponwa/do-data-utils/actions/workflows/static-checking.yml/badge.svg)
 ![Continuous Testing](https://github.com/anuponwa/do-data-utils/actions/workflows/continuous-testing.yml/badge.svg)
-![Release Testing and Tagging](https://github.com/anuponwa/do-data-utils/actions/workflows/release-testing-and-tag.yml/badge.svg)
 ![Publish Tag to PyPI](https://github.com/anuponwa/do-data-utils/actions/workflows/publish-tag-to-pypi.yml/badge.svg)
 
 This package provides you the functionalities to connect to different cloud sources and data cleaning functions.
@@ -18,7 +17,7 @@ pip install do-data-utils
 ```
 You can install a specific version, for example,
 ```bash
-pip install do-data-utils==2.3.0
+pip install do-data-utils==2.3.1
 ```
 
 ### Install in requirements.txt
@@ -27,7 +26,7 @@ You can also put this source in the `requirements.txt`.
 ```python
 # requirements.txt
 
-do-data-utils==2.3.0
+do-data-utils==2.3.1
 ```
 
 ## Available Subpackages

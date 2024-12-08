@@ -1,9 +1,13 @@
 name: Continuous Testing
 
 on:
-  pull_request:
-    branches-ignore:
+  push:
+    branches:
       - 'release/*'
+
+  pull_request:
+    branches:
+      - main
 
 permissions:
   contents: read

@@ -4,9 +4,10 @@ on:
   push:
     branches:
       - 'release/*'
+
   pull_request:
-    branches-ignore:
-      - 'release/*'
+    branches:
+      - main
 
 permissions:
   contents: read
