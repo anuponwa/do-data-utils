@@ -1,0 +1,30 @@
+name: Continuous Testing
+
+on:
+  push:
+    branches-ignore:
+      - 'release/*'
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  release-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Dependencies
+        run: pip install -e .
+             pip install mypy==1.13.0 pytest==8.3.4
+
+      - name: Run Tests
+        run: pytest tests/

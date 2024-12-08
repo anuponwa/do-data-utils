@@ -1,5 +1,9 @@
 # Change Log
 
+## 2.3.1
+* Fix return in `clean_phone()` in some cases where it returned `''` instead of `None`
+* Add a bunch of unittests
+
 ## 2.3.0
 * Add options to pass in the secret file path instead of dict in `get_secret()`
 * Other GBQ and GCS functions also have this option. `secret` can be a type of `dict` or `str` that ends with '.json'
