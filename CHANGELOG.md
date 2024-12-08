@@ -3,6 +3,7 @@
 ## 2.3.1
 * Fix return in `clean_phone()` in some cases where it returned `''` instead of `None`
 * Add a bunch of unittests
+* Add Github actions workflows to automate CI/CD testing and deployment
 
 ## 2.3.0
 * Add options to pass in the secret file path instead of dict in `get_secret()`

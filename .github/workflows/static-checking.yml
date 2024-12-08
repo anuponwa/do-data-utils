@@ -2,7 +2,11 @@ name: Static Type Checking
 
 on:
   push:
+    branches:
+      - 'release/*'
   pull_request:
+    branches-ignore:
+      - 'release/*'
 
 permissions:
   contents: read
