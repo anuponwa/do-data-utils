@@ -1,5 +1,8 @@
 name: Release Testing and Tag
 
+permissions:
+  contents: write
+  
 on:
   push:
     branches:
