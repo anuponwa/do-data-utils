@@ -131,5 +131,3 @@ def mock_azure_oauth_service_principal():
         mock_credentials = MagicMock()
         mock_service_principal.return_value = mock_credentials
         yield mock_credentials
-
-
