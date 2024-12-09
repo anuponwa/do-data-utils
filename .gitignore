@@ -2,6 +2,8 @@
 **/*__pycache__
 **/*.ipynb
 .pytest_cache
+.coverage
+.mypy*
 
 # build
 build

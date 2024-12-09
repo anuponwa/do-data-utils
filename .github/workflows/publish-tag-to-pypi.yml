@@ -29,8 +29,11 @@ jobs:
       - name: Install Dependencies
         run: pip install -r requirements_dev.txt
   
-      - name: Run Tests
+      - name: Run Static Type Checking
         run: mypy do_data_utils --ignore-missing-imports --disable-error-code attr-defined
+
+      - name: Run Tests
+        run: pytest --cov=do_data_utils tests/
 
       - name: Build release distributions
         if: ${{ success() }}
