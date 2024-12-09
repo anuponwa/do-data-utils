@@ -107,10 +107,11 @@ def df_to_excel_gcs(df, gcspath: str, secret: Union[dict, str], **kwargs) -> Non
     -------
     None
     """
+
     output = io.BytesIO()
     writer = pd.ExcelWriter(output)
-    df.to_excel(writer, index=False, **kwargs)
-    writer.save()
+    with pd.ExcelWriter(output):
+        df.to_excel(writer, index=False, **kwargs)
     
     io_to_gcs(output, gcspath, secret=secret)
 
@@ -364,9 +365,10 @@ def df_to_gcs(df, gcspath: str, secret: Union[dict, str], **kwargs):
     """
 
     if not gcspath.startswith('gs://'):
-        raise Exception("The path has to start with 'gs://'.")
+        raise ValueError("The path has to start with 'gs://'.")
+    
     if not gcspath.endswith('.csv') and not gcspath.endswith('.xlsx'):
-        raise Exception('The file name has to be either .csv or .xlsx file.')
+        raise ValueError('The file name has to be either .csv or .xlsx file.')
         
     if gcspath.endswith('.csv'):
         csv_data = df.to_csv(index=False, **kwargs)
@@ -397,6 +399,12 @@ def dict_to_json_gcs(dict_data: dict, gcspath: str, secret: Union[dict, str]):
     -------
     None
     """
+
+    if not gcspath.startswith('gs://'):
+        raise ValueError("The path has to start with 'gs://'.")
+    
+    if not gcspath.endswith('.json'):
+        raise ValueError('The file name has .json file.')
 
     byte_stream = io.StringIO()
     json.dump(dict_data, byte_stream)

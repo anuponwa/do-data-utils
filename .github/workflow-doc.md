@@ -49,7 +49,6 @@ Then we create a new release branch from main.
 git checkout -b release/x.y.z main
 ```
 
-The workflow (that builds and publishes to PyPI) is triggered *only* when a new tag is pushed to the repo.
 
 For example, we are in `release/x.y.z` branch and we've finished our work.
 We push to the repo.
@@ -58,7 +57,20 @@ We push to the repo.
 git commit -m "Done with this release"
 git push origin release/x.y.z
 ```
+
+### Continuous tests
+
+The continuous testing workflow (Github actions) will run and check for static type hints and unittests.
+
+The tests will run with every push to `release/*` branches and every pull request to the `main` branch.
+
+
+### Automate publish to PyPI
+
 We then create tag and push the tag
+
+The workflow (that builds and publishes to PyPI) is triggered *only* when a new tag is pushed to the repo.
+
 ```bash
 git tag x.y.z
 git push origin x.y.z

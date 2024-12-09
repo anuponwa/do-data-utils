@@ -9,7 +9,7 @@ from .common import get_secret_info
 # Helper functions
 # ----------------
 
-def set_gbq_credentials(secret: Union[dict, str]):
+def set_gbq_credentials(secret: Union[dict, str]) -> service_account.Credentials:
     """Set GBQ credentials based on the given `secret`
 
     Parameters
@@ -28,7 +28,7 @@ def set_gbq_credentials(secret: Union[dict, str]):
     return credentials
 
 
-def set_gbq_client(secret: Union[dict, str]):
+def set_gbq_client(secret: Union[dict, str]) -> bigquery.Client:
     """Set GBQ client based on the given `secret`
     
     Parameters
@@ -88,7 +88,7 @@ def gbq_to_df(query: str, secret: Union[dict, str], polars: bool=False):
     return df
 
 
-def df_to_gbq(df, gbq_tb: str, secret: Union[dict, str], if_exists: str='fail', table_schema=None):
+def df_to_gbq(df, gbq_tb: str, secret: Union[dict, str], if_exists: str='fail', table_schema=None) -> None:
     """Uploads a pandas.DataFrame to a GBQ table
     
     Parameters
