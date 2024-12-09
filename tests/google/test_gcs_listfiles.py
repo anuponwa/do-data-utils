@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import MagicMock
-from do_data_utils.google import gcs_exists, gcs_listdirs, gcs_listfiles
+from do_data_utils.google import gcs_listfiles
 
 
 def test_gcs_listfiles_files_only(mock_gcs_client, mock_gcs_service_account_credentials, secret_json_dict):
