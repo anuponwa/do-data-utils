@@ -1,5 +1,10 @@
 # Change Log
 
+## 2.3.2
+* Use context manager in saving Excel to GCP
+* Add checks in `gcspath` input of GCS JSON upload function
+* Add a bunch of unittests relating to GBQ, uploading files, and Azure
+
 ## 2.3.1
 * Fix return in `clean_phone()` in some cases where it returned `''` instead of `None`
 * Add a bunch of unittests
