@@ -1,4 +1,3 @@
-import pytest
 from unittest.mock import MagicMock
 from do_data_utils.google import gcs_exists
 

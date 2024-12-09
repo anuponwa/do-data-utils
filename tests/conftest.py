@@ -115,4 +115,3 @@ def mock_gcs_client():
         client_instance = MagicMock()
         mock_client.return_value = client_instance
         yield client_instance
-

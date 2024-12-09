@@ -1,9 +1,8 @@
 import io
 import pandas as pd
 import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock
 from do_data_utils.google.gcputils import str_to_gcs, io_to_gcs, df_to_gcs, dict_to_json_gcs
-
 
 
 def test_str_to_gcs(mock_gcs_client, mock_gcs_service_account_credentials, secret_json_dict):
