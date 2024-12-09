@@ -115,3 +115,21 @@ def mock_gcs_client():
         client_instance = MagicMock()
         mock_client.return_value = client_instance
         yield client_instance
+
+
+@pytest.fixture
+def mock_azure_config():
+    with patch("do_data_utils.azure.databricks.sdk.core.Config") as mock_config:
+        config = MagicMock()
+        mock_config.return_value = config
+        yield config
+
+
+@pytest.fixture
+def mock_azure_oauth_service_principal():
+    with patch("do_data_utils.azure.databricks.sdk.core.oauth_service_principal") as mock_service_principal:
+        mock_credentials = MagicMock()
+        mock_service_principal.return_value = mock_credentials
+        yield mock_credentials
+
+

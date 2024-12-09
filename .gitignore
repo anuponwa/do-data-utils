@@ -1,6 +1,7 @@
 # cached and test files
 **/*__pycache__
 **/*.ipynb
+.pytest_cache
 
 # build
 build
