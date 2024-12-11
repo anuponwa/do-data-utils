@@ -1,12 +1,15 @@
 import io
+import itertools
 import pandas as pd
 import pytest
-from unittest.mock import MagicMock
+from unittest.mock import patch, MagicMock
 from do_data_utils.google.gcputils import (
     str_to_gcs,
     io_to_gcs,
     df_to_gcs,
     dict_to_json_gcs,
+    file_to_gcs,
+    upload_folder_gcs
 )
 
 
@@ -163,3 +166,61 @@ def test_dict_to_json_gcs_invalid_path(param, secret_json_dict):
     with pytest.raises(ValueError):
         some_dict = {"a": 1, "b": 2}
         dict_to_json_gcs(some_dict, gcspath=param, secret=secret_json_dict)
+
+
+
+@patch("do_data_utils.google.gcputils.io_to_gcs")
+@patch("builtins.open")
+def test_file_to_gcs(mock_open, mock_io_to_gcs):
+    # Setup
+    mock_open.return_value.__enter__.return_value.read = MagicMock(return_value=b"file content")
+    
+    file_path = "local_file.txt"
+    gcspath = "gs://bucket/path/to/file.txt"
+    
+    # Call function
+    file_to_gcs(file_path, gcspath)
+    
+    # Check if file was opened and io_to_gcs was called
+    mock_open.assert_called_once_with(file_path, "rb")
+    mock_io_to_gcs.assert_called_once_with(io_output=mock_open.return_value.__enter__.return_value, gcspath=gcspath, secret=None)
+
+
+
+@patch("do_data_utils.google.gcputils.set_gcs_client")
+@patch("os.walk")
+@patch("os.makedirs")
+def test_upload_folder_gcs(mock_makedirs, mock_os_walk, mock_set_gcs_client):
+    # Setup
+    mock_client = MagicMock()
+    mock_set_gcs_client.return_value = mock_client
+    mock_bucket = MagicMock()
+    mock_client.get_bucket.return_value = mock_bucket
+
+    mock_blob1 = MagicMock()
+    mock_blob2 = MagicMock()
+    mock_blob3 = MagicMock()
+
+    mock_blobs = [mock_blob1, mock_blob2, mock_blob3]
+
+    mock_bucket.blob.side_effect = itertools.cycle(mock_blobs)
+
+    # Mock os.walk to simulate local directory files
+    mock_os_walk.return_value = [
+        ("local_dir", ["subfolder"], ["file1.txt", "file2.txt"]),
+        ("local_dir/subfolder", [], ["file3.txt"]),
+    ]
+
+    local_dir = "local_dir"
+    gcspath = "gs://bucket/folder/"
+
+    # Call function
+    upload_folder_gcs(local_dir, gcspath)
+
+    # Check upload_from_filename were called
+    mock_bucket.blob.assert_any_call("folder/file1.txt")
+    mock_bucket.blob.assert_any_call("folder/file2.txt")
+    mock_bucket.blob.assert_any_call("folder/subfolder/file3.txt")
+    mock_blob1.upload_from_filename.assert_any_call("local_dir/file1.txt")
+    mock_blob2.upload_from_filename.assert_any_call("local_dir/file2.txt")
+    mock_blob3.upload_from_filename.assert_any_call("local_dir/subfolder/file3.txt")

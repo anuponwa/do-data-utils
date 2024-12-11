@@ -2,6 +2,7 @@ from google.cloud import storage
 from google.oauth2 import service_account
 import io
 import json
+import os
 import pandas as pd
 import polars as pl
 from typing import Optional, Union
@@ -129,7 +130,7 @@ def df_to_excel_gcs(
     io_to_gcs(output, gcspath, secret=secret)
 
 
-def gcs_to_file(gcspath: str, secret: Optional[Union[dict, str]] = None) -> io.BytesIO:
+def gcs_to_io(gcspath: str, secret: Optional[Union[dict, str]] = None) -> io.BytesIO:
     """Downloads a GCS file to IO
 
     Parameter
@@ -191,6 +192,7 @@ def gcs_listfiles(
         raise ValueError("The path has to start with 'gs://'.")
     if not gcspath.endswith("/"):
         gcspath += "/"
+
     client = set_gcs_client(secret)
     bucket = client.get_bucket(gcspath.split("/")[2])
     dirpath = "/".join(gcspath.split("/")[3:])
@@ -311,7 +313,7 @@ def gcs_to_dict(gcspath: str, secret: Optional[Union[dict, str]] = None) -> dict
         A dictionary.
     """
 
-    f = gcs_to_file(gcspath, secret)
+    f = gcs_to_io(gcspath, secret)
     return json.load(f)
 
 
@@ -350,11 +352,11 @@ def gcs_to_df(
         raise ValueError("The file name has to be either .csv or .xlsx file.")
 
     if gcspath.endswith(".csv"):
-        f = gcs_to_file(gcspath, secret=secret)
+        f = gcs_to_io(gcspath, secret=secret)
         df = pd.read_csv(f, **kwargs)
 
     elif gcspath.endswith(".xlsx"):
-        f = gcs_to_file(gcspath, secret=secret)
+        f = gcs_to_io(gcspath, secret=secret)
         df = pd.read_excel(f, sheet_name=None, **kwargs)
 
     if polars:
@@ -441,3 +443,178 @@ def dict_to_json_gcs(
     json.dump(dict_data, byte_stream)
 
     io_to_gcs(byte_stream, gcspath, secret=secret)
+
+
+# ------------------
+# Files and folders
+# ------------------
+
+
+def gcs_to_file(gcspath: str, secret: Optional[Union[dict, str]] = None) -> None:
+    """Downloads a GCS file to the current directory
+
+    Parameters
+    ----------
+    gcspath: str
+        GCS path to a file. It must start with 'gs://'.
+
+    secret: dict | str | None, default = None
+        A secret dictionary used to authenticate the GCS
+        or a path to the secret.json file.
+        If None, it uses the default credentials.
+
+    Returns
+    -------
+    None
+    """
+
+    if not gcspath.startswith("gs://"):
+        raise ValueError("The path has to start with 'gs://'.")
+
+    if gcspath.endswith("/"):
+        raise ValueError("`gcspath` parameter must be a file.")
+
+    byte_stream = gcs_to_io(gcspath=gcspath, secret=secret)
+    file_name = gcspath.split("/")[-1]
+    with open(file_name, "wb") as f:
+        f.write(byte_stream.read())
+
+
+def file_to_gcs(
+    file_path: str, gcspath: str, secret: Optional[Union[dict, str]] = None
+) -> None:
+    """Uploads a local file to GCS bucket/directory
+
+    Parameters
+    ----------
+    file_path: str
+        Path to file to upload.
+
+    gcspath: str
+        GCS path to a file. It must start with 'gs://'.
+        It must have the same file type as the `file_path`.
+
+    secret: dict | str | None, default = None
+        A secret dictionary used to authenticate the GCS
+        or a path to the secret.json file.
+        If None, it uses the default credentials.
+
+    Returns
+    -------
+    None
+    """
+
+    if not gcspath.startswith("gs://"):
+        raise ValueError("The path has to start with 'gs://'.")
+
+    if gcspath.endswith("/"):
+        raise ValueError("`gcspath` parameter must be a file.")
+
+    file_ext = file_path.split(".")[-1]
+    gcsp_ext = gcspath.split(".")[-1]
+    if file_ext != gcsp_ext:
+        raise ValueError(
+            "Both `file_path` and `gcspath` must have the same file extensions."
+        )
+
+    with open(file_path, "rb") as f:
+        io_to_gcs(io_output=f, gcspath=gcspath, secret=secret)
+
+
+def download_folder_gcs(
+    gcspath: str, local_dir: str, secret: Optional[Union[dict, str]] = None
+) -> None:
+    """Downloads the entire folder to a local directory
+
+    Parameters
+    ----------
+    gcspath: str
+        GCS path to a folder. It must start with 'gs://'.
+
+    local_dir: str
+        Local directory you want to save the results.
+        The folder can either exist or not.
+
+    secret: dict | str | None, default = None
+        A secret dictionary used to authenticate the GCS
+        or a path to the secret.json file.
+        If None, it uses the default credentials.
+
+    Returns
+    -------
+    None
+    """
+
+    if not gcspath.startswith("gs://"):
+        raise ValueError("The path has to start with 'gs://'.")
+
+    if not gcspath.endswith("/"):
+        gcspath += "/"
+
+    client = set_gcs_client(secret)
+    bucket = client.get_bucket(gcspath.split("/")[2])
+    dirpath = "/".join(gcspath.split("/")[3:])  # Directory path in GCS
+
+    blobs = bucket.list_blobs(prefix=dirpath)
+
+    # Ensure the local directory exists
+    os.makedirs(local_dir, exist_ok=True)
+
+    # Iterate through all files and download them
+    for blob in blobs:
+        # Create a local file path by joining the local directory with the blob's name
+        local_file_path = os.path.join(local_dir, blob.name[len(dirpath) :])
+
+        # Ensure the local folder structure exists
+        os.makedirs(os.path.dirname(local_file_path), exist_ok=True)
+
+        # Download the file
+        blob.download_to_filename(local_file_path)
+
+
+def upload_folder_gcs(
+    local_dir: str, gcspath: str, secret: Optional[Union[dict, str]] = None
+):
+    """Uploads the entire folder to GCS
+
+    Parameters
+    ----------
+    local_dir: str
+        Local directory you want to upload.
+
+    gcspath: str
+        GCS path to the folder to upload to. It must start with 'gs://'.
+
+    secret: dict | str | None, default = None
+        A secret dictionary used to authenticate the GCS
+        or a path to the secret.json file.
+        If None, it uses the default credentials.
+
+    Returns
+    -------
+    None
+    """
+
+    if not gcspath.startswith("gs://"):
+        raise ValueError("The path has to start with 'gs://'.")
+
+    # Authenticate and create a GCS client
+    client = set_gcs_client(secret)
+    bucket = client.get_bucket(gcspath.split("/")[2])
+    dirpath = "/".join(gcspath.split("/")[3:])  # Directory path in GCS
+
+    # Iterate over all files in the local directory (including subfolders)
+    for root, dirs, files in os.walk(local_dir):
+        for file in files:
+            local_file_path = os.path.join(root, file)
+
+            # Create a relative path for the file from the local directory
+            relative_path = os.path.relpath(local_file_path, local_dir)
+
+            # Construct the GCS path (including the folder prefix)
+            gcs_path = os.path.join(dirpath, relative_path).replace(os.sep, "/")
+
+            # Upload the file to GCS
+            blob = bucket.blob(gcs_path)
+            blob.upload_from_filename(local_file_path)
+            print(f"Uploaded {local_file_path} to gs://{bucket}/{gcs_path}")
