@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.4.0
+* Add upload to Sharepoint support.
+* You can now upload from local file or a `pd.DataFrame`.
+* `polars` is now part of the library.
+* Add some tests.
+
 ## 2.3.2
 * Use context manager in saving Excel to GCP
 * Add checks in `gcspath` input of GCS JSON upload function

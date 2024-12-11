@@ -55,9 +55,9 @@ def get_access_token(
         A list of scopes to use with `msal`.
         The default values are:
         [
-            "https://scgo365.sharepoint.com/AllSites.{Manage}",
-            "https://scgo365.sharepoint.com/AllSites.{Read}",
-            "https://scgo365.sharepoint.com/AllSites.{Write}"
+            "https://scgo365.sharepoint.com/AllSites.Manage",
+            "https://scgo365.sharepoint.com/AllSites.Read",
+            "https://scgo365.sharepoint.com/AllSites.Write"
         ]
 
     Returns
@@ -89,7 +89,7 @@ def bytes_to_sharepoint(
     file_content: bytes,
     site: str,
     sharepoint_dir: str,
-    file_path: str,
+    file_name: str,
     access_token: str,
 ) -> None:
     """Uploads a bytes object to a Sharepoint location
@@ -106,7 +106,7 @@ def bytes_to_sharepoint(
         A Sharepoint directory.
         E.g., "Shared Documents/Directory1/Some sub-directory".
 
-    file_path: str
+    file_name: str
         Path to the local file to be uploaded.
         This will also be the name of the file in Sharepoint.
 
@@ -123,7 +123,7 @@ def bytes_to_sharepoint(
         "Content-Type": "application/json;odata=verbose",
         "Accept": "application/json;odata=verbose",
     }
-    upload_url = f"https://scgo365.sharepoint.com/sites/{site}/_api/web/getfolderbyserverrelativeurl('{sharepoint_dir}')/files/add(url='{file_path}',overwrite=true)"
+    upload_url = f"https://scgo365.sharepoint.com/sites/{site}/_api/web/getfolderbyserverrelativeurl('{sharepoint_dir}')/files/add(url='{file_name}',overwrite=true)"
 
     # Make the request to upload the file
     response = requests.post(upload_url, headers=headers, data=file_content)
@@ -140,7 +140,7 @@ def bytes_to_sharepoint(
 def file_to_sharepoint(
     site: str,
     sharepoint_dir: str,
-    file_path: str,
+    file_name: str,
     secret: dict,
     refresh_token: str,
     scopes: Optional[list[str]] = None,
@@ -156,7 +156,7 @@ def file_to_sharepoint(
         A Sharepoint directory.
         E.g., "Shared Documents/Directory1/Some sub-directory".
 
-    file_path: str
+    file_name: str
         Path to the local file to be uploaded.
         This will also be the name of the file in Sharepoint.
 
@@ -199,18 +199,18 @@ def file_to_sharepoint(
     sharepoint_dir = sharepoint_dir.strip("/")
 
     # Read the file content
-    with open(file_path, "rb") as f:
+    with open(file_name, "rb") as f:
         file_content = f.read()
 
     # Upload the file content
-    bytes_to_sharepoint(file_content, site, sharepoint_dir, file_path, access_token)
+    bytes_to_sharepoint(file_content, site, sharepoint_dir, file_name, access_token)
 
 
 def df_to_sharepoint(
     df: pd.DataFrame,
     site: str,
     sharepoint_dir: str,
-    file_path: str,
+    file_name: str,
     secret: dict,
     refresh_token: str,
     scopes: Optional[list[str]] = None,
@@ -230,7 +230,7 @@ def df_to_sharepoint(
         A Sharepoint directory.
         E.g., "Shared Documents/Directory1/Some sub-directory".
 
-    file_path: str
+    file_name: str
         Path to the local file to be uploaded.
         This will also be the name of the file in the Sharepoint.
 
@@ -275,14 +275,14 @@ def df_to_sharepoint(
     site = site.strip("/")
     sharepoint_dir = sharepoint_dir.strip("/")
 
-    if not file_path.endswith(".csv") or not file_path.endswith(".xlsx"):
-        raise ValueError("The `file_path` must be either .csv or .xlsx file.")
+    if not file_name.endswith(".csv") and not file_name.endswith(".xlsx"):
+        raise ValueError("The `file_name` must be either .csv or .xlsx file.")
 
-    if file_path.endswith(".csv"):
+    if file_name.endswith(".csv"):
         csv_string = df.to_csv(index=False, **kwargs)
         file_content = csv_string.encode("utf-8")  # Convert to bytes
 
-    elif file_path.endswith(".xlsx"):
+    elif file_name.endswith(".xlsx"):
         io_output = io.BytesIO()  # Define the output IO
         writer = pd.ExcelWriter(io_output)  # and the writer
 
@@ -293,4 +293,4 @@ def df_to_sharepoint(
         file_content = io_output.read() # Read the content to a variable
 
     # Upload the file content
-    bytes_to_sharepoint(file_content, site, sharepoint_dir, file_path, access_token)
+    bytes_to_sharepoint(file_content, site, sharepoint_dir, file_name, access_token)
