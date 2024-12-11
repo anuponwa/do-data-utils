@@ -1,8 +1,8 @@
 import json
-from typing import Union
+from typing import Optional, Union
 
 
-def get_secret_info(secret: Union[dict, str]) -> dict:
+def get_secret_info(secret: Union[dict, str]) -> Optional[dict]:
     """Gets the secret info
 
     Parameters

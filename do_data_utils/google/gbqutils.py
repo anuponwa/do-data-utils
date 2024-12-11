@@ -1,7 +1,8 @@
+from google.auth import default
 from google.cloud import bigquery
 from google.oauth2 import service_account
 import polars as pl
-from typing import Union
+from typing import Optional, Union
 
 from .common import get_secret_info
 
@@ -11,42 +12,54 @@ from .common import get_secret_info
 # ----------------
 
 
-def set_gbq_credentials(secret: Union[dict, str]) -> service_account.Credentials:
+def set_gbq_credentials(
+    secret: Optional[Union[dict, str]] = None
+) -> service_account.Credentials:
     """Set GBQ credentials based on the given `secret`
 
     Parameters
     ----------
-    secret: dict | str
-        A secret dictionary used to authenticate the GBQ
+    secret: dict | str | None, default = None
+        A secret dictionary used to authenticate the Google Bigquery
         or a path to the secret.json file.
+        If None, it uses the default client/credentials
 
     Returns
     -------
     GBQ credentials
     """
 
-    secret_info = get_secret_info(secret)
-    credentials = service_account.Credentials.from_service_account_info(secret_info)
+    if secret:
+        secret_info = get_secret_info(secret)
+        credentials = service_account.Credentials.from_service_account_info(secret_info)
+    else:
+        credentials, _ = default()
+
     return credentials
 
 
-def set_gbq_client(secret: Union[dict, str]) -> bigquery.Client:
+def set_gbq_client(secret: Optional[Union[dict, str]] = None) -> bigquery.Client:
     """Set GBQ client based on the given `secret`
 
     Parameters
     ----------
-    secret: dict | str
+    secret: dict | str | None, default = None
         A secret dictionary used to authenticate the Google Bigquery
         or a path to the secret.json file.
+        If None, it uses the default client/credentials
 
     Returns
     -------
     bigquery.CLient
     """
 
-    secret_info = get_secret_info(secret)
-    credentials = service_account.Credentials.from_service_account_info(secret_info)
-    client = bigquery.Client(credentials=credentials)
+    if secret:
+        secret_info = get_secret_info(secret)
+        credentials = service_account.Credentials.from_service_account_info(secret_info)
+        client = bigquery.Client(credentials=credentials)
+    else:
+        client = bigquery.Client()
+
     return client
 
 
@@ -55,7 +68,9 @@ def set_gbq_client(secret: Union[dict, str]) -> bigquery.Client:
 # ----------------
 
 
-def gbq_to_df(query: str, secret: Union[dict, str], polars: bool = False):
+def gbq_to_df(
+    query: str, secret: Optional[Union[dict, str]] = None, polars: bool = False
+):
     """Executes the `select` query and downloads it as a pandas.DataFrame
 
     Parameter
@@ -63,9 +78,10 @@ def gbq_to_df(query: str, secret: Union[dict, str], polars: bool = False):
     query: str
         An SQL query to be executed.
 
-    secret: dict | str
+    secret: dict | str | None, default = None
         A secret dictionary used to authenticate the Google Bigquery
         or a path to the secret.json file.
+        If None, it uses the default client/credentials
 
     polars: bool, default=False
         If polars is True, the function returns polars.DataFrame (only if polars is installed in the environment).
@@ -87,7 +103,7 @@ def gbq_to_df(query: str, secret: Union[dict, str], polars: bool = False):
 def df_to_gbq(
     df,
     gbq_tb: str,
-    secret: Union[dict, str],
+    secret: Optional[Union[dict, str]] = None,
     if_exists: str = "fail",
     table_schema=None,
 ) -> None:
@@ -102,9 +118,10 @@ def df_to_gbq(
         GBQ table name including the project id and dataset id.
         For example, 'scg-cbm-do-dev-rg.indv_abc.test_table'.
 
-    secret: dict | str
+    secret: dict | str | None, default = None
         A secret dictionary used to authenticate the Google Bigquery
         or a path to the secret.json file.
+        If None, it uses the default client/credentials
 
     if_exists: str, default='fail'
         What to do if the table already exists.
