@@ -1,11 +1,12 @@
 import re
 from typing import Optional
+
 from .constants import EXCLUDE_PHONE_NUMBER_LIST
 
 
-def clean_phone(phone: str, exclude_numbers: Optional[list]=None) -> Optional[str]:
+def clean_phone(phone: str, exclude_numbers: Optional[list] = None) -> Optional[str]:
     """Cleans phone numbers and outputs a list of valid phone numbers
-    
+
     Parameters
     ----------
     phone: str
@@ -30,69 +31,84 @@ def clean_phone(phone: str, exclude_numbers: Optional[list]=None) -> Optional[st
     """
 
     if exclude_numbers is not None and not isinstance(exclude_numbers, list):
-        raise ValueError('`exclude_numbers` must be a list or None')
+        raise ValueError("`exclude_numbers` must be a list or None")
 
     if not phone:
         return None
-    
-    phone = re.sub(r'\s|\(|\)|\+', '', phone) # Remove '(', ')', spaces, and '+' sign
-    phone_arr = phone.split('|') # Split the text by the comma, in case there are multiple numbers
-    
-    phone_pat = r'^[-\d]+' # Search and keep for numbers, possibly with dashes
-    
+
+    phone = re.sub(r"\s|\(|\)|\+", "", phone)  # Remove '(', ')', spaces, and '+' sign
+    phone_arr = phone.split(
+        "|"
+    )  # Split the text by the comma, in case there are multiple numbers
+
+    phone_pat = r"^[-\d]+"  # Search and keep for numbers, possibly with dashes
+
     ret_arr = []
     for ele in phone_arr:
-        match = re.search(pattern=phone_pat, string=ele) # Search and keep for numbers, possibly with dashes
+        match = re.search(
+            pattern=phone_pat, string=ele
+        )  # Search and keep for numbers, possibly with dashes
         if match:
-            phone_num = match.group() # Get the matched phone number
-            phone_num = re.sub(r'-(?=\d{3,})', '', phone_num) # Replace the dash ('-') in the phone number, only if it's followed by 3 digits or more
-            
+            phone_num = match.group()  # Get the matched phone number
+            phone_num = re.sub(
+                r"-(?=\d{3,})", "", phone_num
+            )  # Replace the dash ('-') in the phone number, only if it's followed by 3 digits or more
+
             # Take care the case where the number has dash ('-') at the end, e.g., 0881112222-25
             # Please note that at this point, there may still be dashes left in the string, e.g., 081-23-45678 (if the dash is followed by fewer than 3 digits)
-            if phone_num[-3:][0] == '-':
+            if phone_num[-3:][0] == "-":
                 number_before_last_two_digits = phone_num[:-5]
                 last_two_digits = phone_num[-5:-3]
                 until_two_digits = phone_num[-2:]
-                try: # Try converting and concatenating the numbers
-                    num_arr = [re.sub(r'-', '', number_before_last_two_digits + str(ii)) for ii in range(int(last_two_digits), int(until_two_digits)+1)] # Also, finally, replace all the dashes left in the string
+                try:  # Try converting and concatenating the numbers
+                    num_arr = [
+                        re.sub(r"-", "", number_before_last_two_digits + str(ii))
+                        for ii in range(int(last_two_digits), int(until_two_digits) + 1)
+                    ]  # Also, finally, replace all the dashes left in the string
                     ret_arr.extend(num_arr)
-                except: # If fails, just cut out the last part
-                    ret_arr.append(re.sub(r'-', '', phone_num[:-3]))
-                    
-            elif phone_num[-2:][0] == '-':
+                except:  # If fails, just cut out the last part
+                    ret_arr.append(re.sub(r"-", "", phone_num[:-3]))
+
+            elif phone_num[-2:][0] == "-":
                 number_before_last_digit = phone_num[:-3]
                 last_digit = phone_num[-3:-2]
                 until_digit = phone_num[-1:]
-                try: # Try converting and concatenating the numbers
-                    num_arr = [re.sub(r'-', '', number_before_last_digit + str(ii)) for ii in range(int(last_digit), int(until_digit)+1)] # Also, finally, replace all the dashes left in the string
+                try:  # Try converting and concatenating the numbers
+                    num_arr = [
+                        re.sub(r"-", "", number_before_last_digit + str(ii))
+                        for ii in range(int(last_digit), int(until_digit) + 1)
+                    ]  # Also, finally, replace all the dashes left in the string
                     ret_arr.extend(num_arr)
-                except: # If fails, just cut out the last part
-                    ret_arr.append(re.sub(r'-', '', phone_num[:-2]))
-            
+                except:  # If fails, just cut out the last part
+                    ret_arr.append(re.sub(r"-", "", phone_num[:-2]))
+
             else:
                 ret_arr.append(phone_num)
-                
-    
-    if not ret_arr: # Check if there are any elements in the ret_arr
+
+    if not ret_arr:  # Check if there are any elements in the ret_arr
         return None
-    
+
     # Final pattern match for phone numbers
     final_ret_arr = []
-    prefix_pat = r'^\+?66'
-    final_phone_pat = r'\d{9,10}'
-    
+    prefix_pat = r"^\+?66"
+    final_phone_pat = r"\d{9,10}"
+
     for ele in ret_arr:
-        ele_cleaned = re.sub(prefix_pat, '0', ele)
+        ele_cleaned = re.sub(prefix_pat, "0", ele)
         match = re.search(pattern=final_phone_pat, string=ele_cleaned)
-        
+
         if match:
             phone_num = match.group()
 
-            exclude_numbers = EXCLUDE_PHONE_NUMBER_LIST if exclude_numbers is None else exclude_numbers
-            
-            if phone_num not in exclude_numbers and not phone_num.startswith('000'):
+            exclude_numbers = (
+                EXCLUDE_PHONE_NUMBER_LIST
+                if exclude_numbers is None
+                else exclude_numbers
+            )
+
+            if phone_num not in exclude_numbers and not phone_num.startswith("000"):
                 final_ret_arr.append(phone_num)
-                
-    final_phone = '|'.join(final_ret_arr)
-    
+
+    final_phone = "|".join(final_ret_arr)
+
     return final_phone if final_phone else None

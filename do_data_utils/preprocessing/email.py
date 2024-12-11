@@ -1,10 +1,11 @@
 from typing import Optional
+
 from .common import search_regexp
 
 
 def clean_email(email: str) -> Optional[str]:
     """Cleans the e-mail
-    
+
     Parameters
     ----------
     email: str
@@ -18,6 +19,6 @@ def clean_email(email: str) -> Optional[str]:
 
     if not email:
         return None
-    
-    email_pat = r'[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}'
+
+    email_pat = r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}"
     return search_regexp(pattern=email_pat, string=email)
