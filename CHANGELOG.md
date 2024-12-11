@@ -1,5 +1,10 @@
 # Change Log
 
+## 2.5.0
+* Add support for using default account in cloud environment
+* Add files and folders download and upload functionalities with GCS
+* Add tests to make coverage >= 90%
+
 ## 2.4.0
 * Add upload to Sharepoint support.
 * You can now upload from local file or a `pd.DataFrame`.
