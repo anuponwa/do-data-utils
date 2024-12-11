@@ -82,7 +82,7 @@ def get_access_token(
     if access_token:
         return access_token
     else:
-        raise Exception("Invalid token")
+        return None
 
 
 def bytes_to_sharepoint(
@@ -191,6 +191,9 @@ def file_to_sharepoint(
         msal_app=msal_app, refresh_token=refresh_token, scopes=scopes
     )
 
+    if not access_token:
+        raise ValueError("Invalid access token.")
+
     # Handle the paths parameters
     site = site.strip("/")
     sharepoint_dir = sharepoint_dir.strip("/")
@@ -264,6 +267,9 @@ def df_to_sharepoint(
     access_token = get_access_token(
         msal_app=msal_app, refresh_token=refresh_token, scopes=scopes
     )
+
+    if not access_token:
+        raise ValueError("Invalid access token.")
 
     # Handle the paths parameters
     site = site.strip("/")
