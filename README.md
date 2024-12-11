@@ -34,6 +34,7 @@ do-data-utils==2.4.0
 - `azure` – Utilities for Azure services.
 - `pathutils` – Utilities related to paths.
 - `preprocessing` – Utilities for data preprocessing.
+- `sharepoint` - Utilities for interacting with Microsoft Sharepoint.
 
 For a full list of functions, see the [overview documentation](https://github.com/anuponwa/do-data-utils/blob/main/docs/overview.md).
 
@@ -161,4 +162,36 @@ phones_valid = clean_phone(phone_numbers) # Gets the valid phone numbers
 
 citizenid = '0123456789012'
 citizenid_cleaned = clean_citizenid(citizenid)
+```
+
+### Sharepoint
+
+```python
+import pandas as pd
+from do_data_utils.google import get_secret
+from do_data_utils.sharepoint import df_to_sharepoint
+
+# Load secret key and get the secret to access GCS
+secret_path = "secrets/secret-manager-key.json"
+
+ms_secret = get_secret(secret_id="sharepoint-secret", secret=secret_path, as_json=True)
+refresh_token = get_secret(
+    secret_id="sharepoint-refresh-token", secret=secret_path, as_json=False
+)
+
+# Example DataFrame
+df = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
+
+site = "your-site"
+sharepoint_dir = "Shared Documents/some/path"
+file_name = "output.xlsx"  # or .csv if you wish
+
+df_to_sharepoint(
+    df,
+    site=site,
+    sharepoint_dir=sharepoint_dir,
+    file_name=file_name,
+    secret=ms_secret,
+    refresh_token=refresh_token,
+)
 ```

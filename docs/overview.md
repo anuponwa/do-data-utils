@@ -40,3 +40,12 @@ Utilities for data preprocessing
 - `clean_citizenid(id_str: str)` – Cleans the given 13-digit ID
 - `clean_email(email: str)` – Cleans the e-mail
 - `clean_phone(phone: str, exclude_numbers: Optional[list]=None)` – Cleans phone numbers and outputs a list of valid phone numbers
+
+
+# Subpackage: `sharepoint`
+Utilities for interacting with Microsoft Sharepoint
+
+- `file_to_sharepoint(site: str, sharepoint_dir: str, file_name: str, secret: dict, refresh_token: str, scopes: Optional[list[str]] = None)` – Uploads a file to Sharepoint
+- `df_to_sharepoint(df: pd.DataFrame, site: str, sharepoint_dir: str, file_name: str, secret: dict, refresh_token: str, scopes: Optional[list[str]] = None)` – Uploads a DataFrame to Sharepoint
+- `get_msal_app(secret: dict)` – Gets the MSAL client
+- `get_access_token(msal_app, refresh_token: str, scopes: Optional[list[str]] = None)` – Use an MSAL client with a refresh token to get an access token (a wrapper of `acquire_token_by_refresh_token()` function from MSAL client)
