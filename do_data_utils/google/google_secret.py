@@ -10,7 +10,10 @@ from .common import get_secret_info
 # Helper functions
 # ----------------
 
-def set_secret_manager_client(secret: Union[dict, str]) -> Tuple[secretmanager.SecretManagerServiceClient, dict[str, str]]:
+
+def set_secret_manager_client(
+    secret: Union[dict, str]
+) -> Tuple[secretmanager.SecretManagerServiceClient, dict[str, str]]:
     """Gets a secret manager client
 
     Parameters
@@ -28,7 +31,7 @@ def set_secret_manager_client(secret: Union[dict, str]) -> Tuple[secretmanager.S
     secret = get_secret_info(secret)
     credentials = service_account.Credentials.from_service_account_info(secret)
     client = secretmanager.SecretManagerServiceClient(credentials=credentials)
-    
+
     return client, secret
 
 
@@ -36,7 +39,13 @@ def set_secret_manager_client(secret: Union[dict, str]) -> Tuple[secretmanager.S
 # Utils functions
 # ----------------
 
-def get_secret(secret_id: str, secret: Union[dict, str], as_json: bool=False, version_id: Union[str, int]='latest') -> Union[str, dict]:
+
+def get_secret(
+    secret_id: str,
+    secret: Union[dict, str],
+    as_json: bool = False,
+    version_id: Union[str, int] = "latest",
+) -> Union[str, dict]:
     """Gets secret from Google secret manager
 
     Parameters
@@ -64,29 +73,29 @@ def get_secret(secret_id: str, secret: Union[dict, str], as_json: bool=False, ve
 
     client, secret = set_secret_manager_client(secret=secret)
 
-    project_id = secret['project_id']
+    project_id = secret["project_id"]
 
     # Build the resource name of the secret version.
-    name = f'projects/{project_id}/secrets/{secret_id}/versions/{version_id}'
+    name = f"projects/{project_id}/secrets/{secret_id}/versions/{version_id}"
 
     # Access the secret version.
-    response = client.access_secret_version(request={'name': name})
+    response = client.access_secret_version(request={"name": name})
 
     # Verify payload checksum.
     crc32c = google_crc32c.Checksum()
     crc32c.update(response.payload.data)
     if response.payload.data_crc32c != int(crc32c.hexdigest(), 16):
-        print('Data corruption detected.')
-        raise Exception('Data corruption detected.')
+        print("Data corruption detected.")
+        raise Exception("Data corruption detected.")
 
-    payload = response.payload.data.decode('UTF-8')
+    payload = response.payload.data.decode("UTF-8")
 
     if as_json:
         try:
             return json.loads(payload)
         except json.JSONDecodeError as e:
-            raise ValueError(f'Faled to parse secret as JSON: {e}')
-        
+            raise ValueError(f"Faled to parse secret as JSON: {e}")
+
     return payload
 
 
@@ -109,18 +118,16 @@ def list_secrets(secret: Union[dict, str]):
     # Create the Secret Manager client.
     client, secret = set_secret_manager_client(secret=secret)
 
-    project_id = secret['project_id']
+    project_id = secret["project_id"]
 
     # Build the resource name of the parent project.
-    parent = f'projects/{project_id}'
+    parent = f"projects/{project_id}"
 
     # List all secrets.
     secrets_list = []
-    for secret in client.list_secrets(request={'parent': parent}):
+    for secret in client.list_secrets(request={"parent": parent}):
         secret_name_path = secret.name
-        secret_name = secret_name_path.split('/')[-1]
+        secret_name = secret_name_path.split("/")[-1]
         secrets_list.append(secret_name)
 
     return secrets_list
-
-

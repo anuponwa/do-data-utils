@@ -20,11 +20,11 @@ def get_secret_info(secret: Union[dict, str]) -> dict:
     if isinstance(secret, dict):
         secret_info = secret
 
-    elif isinstance(secret, str) and secret.endswith('.json'):
-        with open(secret, 'r') as f:
+    elif isinstance(secret, str) and secret.endswith(".json"):
+        with open(secret, "r") as f:
             secret_info = json.load(f)
 
     else:
-        raise ValueError('`secret` must be a dictionary or a JSON file path.')
+        raise ValueError("`secret` must be a dictionary or a JSON file path.")
 
     return secret_info
