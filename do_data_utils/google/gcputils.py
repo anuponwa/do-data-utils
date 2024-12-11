@@ -4,7 +4,7 @@ import io
 import json
 import pandas as pd
 import polars as pl
-from typing import Union
+from typing import Optional, Union
 
 from .common import get_secret_info
 
@@ -14,28 +14,32 @@ from .common import get_secret_info
 # ----------------
 
 
-def set_gcs_client(secret: Union[dict, str]):
+def set_gcs_client(secret: Optional[Union[dict, str]] = None):
     """Set GCS client based on the given `secret`
 
     Parameters
     ----------
-    secret: dict | str
+    secret: dict | str | None, default=None
         A secret dictionary used to authenticate the GCS
         or a path to the secret.json file.
+        If None, it uses the default credentials.
 
     Returns
     -------
     storage.Client
     """
 
-    secret = get_secret_info(secret)
-    credentials = service_account.Credentials.from_service_account_info(secret)
-    client = storage.Client(credentials=credentials)
+    if secret:
+        secret = get_secret_info(secret)
+        credentials = service_account.Credentials.from_service_account_info(secret)
+        client = storage.Client(credentials=credentials)
+    else:
+        client = storage.Client()
 
     return client
 
 
-def io_to_gcs(io_output, gcspath: str, secret: Union[dict, str]):
+def io_to_gcs(io_output, gcspath: str, secret: Optional[Union[dict, str]] = None):
     """Uploads IO to GCS
 
     Parameters
@@ -46,9 +50,10 @@ def io_to_gcs(io_output, gcspath: str, secret: Union[dict, str]):
     gcspath: str
         GCS path that starts with 'gs://'.
 
-    secret: dict | str
+    secret: dict | str | None, default = None
         A secret dictionary used to authenticate the GCS
         or a path to the secret.json file.
+        If None, it uses the default credentials.
 
     Returns
     -------
@@ -63,7 +68,9 @@ def io_to_gcs(io_output, gcspath: str, secret: Union[dict, str]):
     blob.upload_from_file(io_output)
 
 
-def str_to_gcs(str_output: str, gcspath: str, secret: Union[dict, str]) -> None:
+def str_to_gcs(
+    str_output: str, gcspath: str, secret: Optional[Union[dict, str]] = None
+) -> None:
     """Uploads string to GCS
 
     Parameters
@@ -74,9 +81,10 @@ def str_to_gcs(str_output: str, gcspath: str, secret: Union[dict, str]) -> None:
     gcspath: str
         GCS path that starts with 'gs://'.
 
-    secret: dict | str
+    secret: dict | str | None, default = None
         A secret dictionary used to authenticate the GCS
         or a path to the secret.json file.
+        If None, it uses the default credentials.
 
     Returns
     -------
@@ -90,7 +98,9 @@ def str_to_gcs(str_output: str, gcspath: str, secret: Union[dict, str]) -> None:
     blob.upload_from_string(str_output)
 
 
-def df_to_excel_gcs(df, gcspath: str, secret: Union[dict, str], **kwargs) -> None:
+def df_to_excel_gcs(
+    df, gcspath: str, secret: Optional[Union[dict, str]] = None, **kwargs
+) -> None:
     """Saves a pandas.DataFrame as an Excel file and uploads to GCS
 
     Parameters
@@ -101,9 +111,10 @@ def df_to_excel_gcs(df, gcspath: str, secret: Union[dict, str], **kwargs) -> Non
     gcspath: str
         GCS path that starts with 'gs://' and ends with 'xlsx'.
 
-    secret: dict | str
+    secret: dict | str | None, default = None
         A secret dictionary used to authenticate the GCS
         or a path to the secret.json file.
+        If None, it uses the default credentials.
 
     Returns
     -------
@@ -118,17 +129,18 @@ def df_to_excel_gcs(df, gcspath: str, secret: Union[dict, str], **kwargs) -> Non
     io_to_gcs(output, gcspath, secret=secret)
 
 
-def gcs_to_file(gcspath: str, secret: Union[dict, str]) -> io.BytesIO:
+def gcs_to_file(gcspath: str, secret: Optional[Union[dict, str]] = None) -> io.BytesIO:
     """Downloads a GCS file to IO
-    
+
     Parameter
     ---------
     gcspath: str
         GCS path to your file.
 
-    secret: dict | str
+    secret: dict | str | None, default = None
         A secret dictionary used to authenticate GCS
         or a path to the secret.json file.
+        If None, it uses the default credentials.
 
     Returns
     -------
@@ -151,7 +163,9 @@ def gcs_to_file(gcspath: str, secret: Union[dict, str]) -> io.BytesIO:
 # ----------------
 
 
-def gcs_listfiles(gcspath: str, secret: Union[dict, str], files_only=True) -> list:
+def gcs_listfiles(
+    gcspath: str, secret: Optional[Union[dict, str]] = None, files_only=True
+) -> list:
     """Lists files in a GCS directory
 
     Parameters
@@ -159,9 +173,10 @@ def gcs_listfiles(gcspath: str, secret: Union[dict, str], files_only=True) -> li
     gcspath: str
         GCS path starting with 'gs://'.
 
-    secret: dict | str
+    secret: dict | str | None, default = None
         A secret dictionary used to authenticate the GCS
         or a path to the secret.json file.
+        If None, it uses the default credentials.
 
     files_only: bool, default=True
         Whether to output only the file inside the given path, or output the whole path.
@@ -198,7 +213,10 @@ def gcs_listfiles(gcspath: str, secret: Union[dict, str], files_only=True) -> li
 
 
 def gcs_listdirs(
-    gcspath: str, secret: Union[dict, str], subdirs_only=True, trailing_slash=False
+    gcspath: str,
+    secret: Optional[Union[dict, str]] = None,
+    subdirs_only=True,
+    trailing_slash=False,
 ) -> list:
     """Lists directories in GCS
 
@@ -207,9 +225,10 @@ def gcs_listdirs(
     gcspath: str
         GCS path starting with 'gs://'.
 
-    secret: dict | str
+    secret: dict | str | None, default = None
         A secret dictionary used to authenticate GCS
         or a path to the secret.json file.
+        If None, it uses the default credentials.
 
     subdirs_only: bool, default=True
         Whether to output only the directory inside the given path, or output the whole path.
@@ -245,7 +264,7 @@ def gcs_listdirs(
     return dirs
 
 
-def gcs_exists(gcspath: str, secret: Union[dict, str]) -> bool:
+def gcs_exists(gcspath: str, secret: Optional[Union[dict, str]] = None) -> bool:
     """Checks whether the given gcspath exists or not
 
     Parameter
@@ -253,9 +272,10 @@ def gcs_exists(gcspath: str, secret: Union[dict, str]) -> bool:
     gcspath: str
         GCS path starting with 'gs://'.
 
-    secret: dict | str
+    secret: dict | str | None, default = None
         A secret dictionary used to authenticate GCS
         or a path to the secret.json file.
+        If None, it uses the default credentials.
 
     Returns
     -------
@@ -272,7 +292,7 @@ def gcs_exists(gcspath: str, secret: Union[dict, str]) -> bool:
     return exists
 
 
-def gcs_to_dict(gcspath: str, secret: Union[dict, str]) -> dict:
+def gcs_to_dict(gcspath: str, secret: Optional[Union[dict, str]] = None) -> dict:
     """Downloads a JSON file to a dictionary
 
     Parameter
@@ -280,9 +300,10 @@ def gcs_to_dict(gcspath: str, secret: Union[dict, str]) -> dict:
     gcspath: str
         GCS path to your json (or dict like) file.
 
-    secret: dict | str
+    secret: dict | str | None, default = None
         A secret dictionary used to authenticate GCS
         or a path to the secret.json file.
+        If None, it uses the default credentials.
 
     Returns
     -------
@@ -294,7 +315,9 @@ def gcs_to_dict(gcspath: str, secret: Union[dict, str]) -> dict:
     return json.load(f)
 
 
-def gcs_to_df(gcspath: str, secret: Union[dict, str], polars=False, **kwargs):
+def gcs_to_df(
+    gcspath: str, secret: Optional[Union[dict, str]] = None, polars=False, **kwargs
+):
     """Downloads a .csv or.xlsx file to a pandas.DataFrame
 
     Parameters
@@ -302,9 +325,10 @@ def gcs_to_df(gcspath: str, secret: Union[dict, str], polars=False, **kwargs):
     gcspath: str
         GCS path to your file.
 
-    secret: dict | str
+    secret: dict | str | None, default = None
         A secret dictionary used to authenticate the GCS
         or a path to the secret.json file.
+        If None, it uses the default credentials.
 
     polars: bool, default=False
         If polars is True, the function returns polars.DataFrame (only if polars is installed in the environment).
@@ -344,7 +368,7 @@ def gcs_to_df(gcspath: str, secret: Union[dict, str], polars=False, **kwargs):
 # -----------------
 
 
-def df_to_gcs(df, gcspath: str, secret: Union[dict, str], **kwargs):
+def df_to_gcs(df, gcspath: str, secret: Optional[Union[dict, str]] = None, **kwargs):
     """Saves a pandas.DataFrame (to any file type, e.g., .csv or .xlsx) and uploads to GCS
 
     Parameters
@@ -355,9 +379,13 @@ def df_to_gcs(df, gcspath: str, secret: Union[dict, str], **kwargs):
     gcspath: str
         GCS path that starts with 'gs://' and ends with your preferred file type such as '.csv' or '.xlsx'.
 
-    secret: dict | str
+    secret: dict | str | None, default = None
         A secret dictionary used to authenticate the GCS
         or a path to the secret.json file.
+        If None, it uses the default credentials.
+
+    **kwargs:
+        Keyword arguments to use with `df.to_csv()` and `df.to_excel()`.
 
     Returns
     -------
@@ -380,7 +408,9 @@ def df_to_gcs(df, gcspath: str, secret: Union[dict, str], **kwargs):
         return f"The file has been successfully uploaded to {gcspath}."
 
 
-def dict_to_json_gcs(dict_data: dict, gcspath: str, secret: Union[dict, str]):
+def dict_to_json_gcs(
+    dict_data: dict, gcspath: str, secret: Optional[Union[dict, str]] = None
+):
     """Uploads a dictionary to a JSON file
 
     Parameters
@@ -391,9 +421,10 @@ def dict_to_json_gcs(dict_data: dict, gcspath: str, secret: Union[dict, str]):
     gcspath: str
         GCS path that starts with 'gs://' and ends with '.json'
 
-    secret: dict | str
+    secret: dict | str | None, default = None
         A secret dictionary used to authenticate the GCS
         or a path to the secret.json file.
+        If None, it uses the default credentials.
 
     Returns
     -------

@@ -84,6 +84,28 @@ def mock_response_from_secret_access_bytes():
 
 
 @pytest.fixture
+def mock_secret_manager_corrupted_response():
+    mock_corrupted_data = b"corrupted-data"
+    mock_response = MagicMock()
+    mock_response.payload.data = mock_corrupted_data
+    crc32c = google_crc32c.Checksum()
+    crc32c.update(b"some-other-data")  # Simulate a mismatched checksum
+    mock_response.payload.data_crc32c = int(crc32c.hexdigest(), 16)
+    return mock_response
+
+
+@pytest.fixture
+def mock_secret_manager_invalid_json_response():
+    mock_invalid_json = b'{"key": "value"'
+    mock_response = MagicMock()
+    mock_response.payload.data = mock_invalid_json
+    crc32c = google_crc32c.Checksum()
+    crc32c.update(mock_invalid_json)
+    mock_response.payload.data_crc32c = int(crc32c.hexdigest(), 16)
+    return mock_response
+
+
+@pytest.fixture
 def mock_response_from_secret_access_json():
     mock_data = b'{"some_key": "some_value"}'
     mock_data_crc32c = google_crc32c.Checksum()
