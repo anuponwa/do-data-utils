@@ -1,3 +1,4 @@
+azure-storage-blob==12.24.0
 databricks-sdk==0.36.0
 databricks-sql-connector==3.6.0
 editdistance==0.8.1
