@@ -15,7 +15,6 @@ from typing import Optional
 # blob_service_client = BlobServiceClient(account_url=account_url, credential=credential)
 
 
-
 def initialize_storage_account(secret: dict) -> str:
     """Returns the connection string for Azure Blob Storage."""
 
@@ -31,11 +30,11 @@ def initialize_storage_account(secret: dict) -> str:
             f"EndpointSuffix=core.windows.net"
         )
         return blob_connection_string
-    
+
     except KeyError as e:
         print(f"Missing key in storage_secret: {e}")
         return None
-    
+
     except Exception as e:
         print(f"Error initializing storage account: {e}")
         return None
@@ -49,7 +48,33 @@ def file_to_azure_storage(
     secret: dict,
     overwrite: bool = True,
 ) -> None:
-    """Uploads a file to Azure Blob Storage."""
+    """Uploads a file to Azure Blob Storage.
+
+    Parameters
+    ----------
+        src_file_path (str): Source file to be uploaded.
+
+        container_name (str): Azure storage container name.
+
+        dest_blob_path (str): Destination blob (dir) path.
+
+        dest_file_name (str): Destination file name.
+
+        secret (dict): Secret dictionary.
+            Example: `{"accountName": "some-account", "key": "some-key"}`
+
+        overwrite (bool, optional): Whether or not to overwrite existing file. Defaults to `True`.
+
+    Returns
+    -------
+        None
+
+    Example
+    -------
+        file_to_azure_storage(
+            "test_file.txt", "test_container", "your/path", "file.txt", mock_secret
+        )
+    """
 
     try:
         blob_connection_string = initialize_storage_account(secret)
@@ -81,7 +106,28 @@ def azure_storage_to_file(
     src_file_name: str,
     secret: dict,
 ) -> None:
-    """Downloads a file from Azure Blob Storage."""
+    """Downloads a file from Azure Blob Storage.
+
+    Parameters
+    ----------
+        container_name (str): Azure storage container name.
+
+        src_blob_path (str): Source blob (dir) path.
+
+        src_file_name (str): Source file name.
+            This file name will be used when saving in local.
+
+        secret (dict): Secret dictionary.
+            Example: `{"accountName": "some-account", "key": "some-key"}`
+
+    Returns
+    -------
+        None
+
+    Example
+    -------
+        azure_storage_to_file("test_container", "path/to/file", "file.txt", mock_secret)
+    """
 
     try:
         blob_connection_string = initialize_storage_account(secret)
@@ -107,7 +153,24 @@ def azure_storage_to_file(
 
 
 def azure_storage_list_files(container_name: str, secret: dict) -> Optional[list[str]]:
-    """Lists all files (blobs) in an Azure Blob Storage container."""
+    """Lists all files (blobs) in an Azure Blob Storage container.
+    
+    Parameters
+    ----------
+        container_name (str): Azure storage container name.
+
+        secret (dict): Secret dictionary.
+            Example: `{"accountName": "some-account", "key": "some-key"}`
+
+    Returns
+    -------
+        list[str] | None
+            A list of blobs' names.
+
+    Example
+    -------
+        azure_storage_list_files("test_container", mock_secret)
+    """
 
     try:
         blob_connection_string = initialize_storage_account(secret)
