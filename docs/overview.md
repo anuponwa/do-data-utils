@@ -31,6 +31,9 @@ Utilities for interacting with Google Cloud
 Utilities for interacting with Azure
 
 - `databricks_to_df(query: str, secret: dict, polars=False)` – Retrieves the data from Databricks SQL in a DataFrame
+- `file_to_azure_storage(src_file_path: str, container_name: str, dest_blob_path: str, dest_file_name: str, secret: dict, overwrite: bool = True)` – Uploads a file to Azure blob storage
+- `azure_storage_to_file(container_name: str, src_blob_path: str, src_file_name: str, secret: dict)` – Downloads a file from Azure blob storage
+- `azure_storage_list_files(container_name: str, secret: dict)` – Lists files in Azure storage container
 
 
 # Subpackage: `pathutils`

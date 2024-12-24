@@ -1,5 +1,9 @@
 # Change Log
 
+## 2.6.0
+* Add support for downloading and uploading to Azure blob storage
+* Add tests
+
 ## 2.5.0
 * Add support for using default account in cloud environment
 * Add files and folders download and upload functionalities with GCS
