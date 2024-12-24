@@ -574,7 +574,7 @@ def download_folder_gcs(
 
 def upload_folder_gcs(
     local_dir: str, gcspath: str, secret: Optional[Union[dict, str]] = None
-):
+) -> None:
     """Uploads the entire folder to GCS
 
     Parameters
