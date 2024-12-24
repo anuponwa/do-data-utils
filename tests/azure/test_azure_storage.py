@@ -35,8 +35,8 @@ def test_initialize_storage_account_valid_secret(mock_secret):
 
 def test_initialize_storage_account_missing_key(mock_secret):
     del mock_secret["key"]
-    connection_string = initialize_storage_account(mock_secret)
-    assert connection_string is None
+    with pytest.raises(KeyError):
+        connection_string = initialize_storage_account(mock_secret)
 
 
 def test_file_to_azure_storage(mock_blob_service_client, mock_secret):

@@ -30,14 +30,12 @@ def initialize_storage_account(secret: dict) -> str:
             f"EndpointSuffix=core.windows.net"
         )
         return blob_connection_string
-
-    except KeyError as e:
-        print(f"Missing key in storage_secret: {e}")
-        return None
+    
+    except KeyError:
+        raise KeyError("The secret must have the following keys: `accountName` and `key`.")
 
     except Exception as e:
-        print(f"Error initializing storage account: {e}")
-        return None
+        raise Exception(f"Error initializing storage account: {e}")
 
 
 def file_to_azure_storage(
@@ -182,3 +180,4 @@ def azure_storage_list_files(container_name: str, secret: dict) -> Optional[list
 
     except Exception as e:
         print(f"Error listing files in blob storage: {e}")
+        return None
