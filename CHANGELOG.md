@@ -1,5 +1,12 @@
 # Change Log
 
+## 3.0.0
+**Breaking features**
+* Revamp the Azure Storage related functions
+* Re-design (internally) how the credentials are authenticated
+* Change the parameters' names and number of parameters in each function
+* Use Data Lake Gen2 instead of legacy blob
+
 ## 2.7.1
 * Fix upload Excel to Sharepoint
 
