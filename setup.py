@@ -11,6 +11,7 @@ setup(
     long_description_content_type="text/markdown",
     packages=find_packages(),
     install_requires=[
+        "azure-identity~=1.19.0",
         "azure-storage-file-datalake~=12.18.0",
         "databricks-sdk~=0.36.0",
         "databricks-sql-connector~=3.6.0",
