@@ -26,26 +26,20 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install Dependencies
-        run: pip install -r requirements_dev.txt
+      - name: Install UV
+        run: pip install uv==0.5.9
   
       - name: Run Static Type Checking
-        run: mypy do_data_utils --ignore-missing-imports --disable-error-code attr-defined
+        run: uv run mypy do_data_utils --ignore-missing-imports --disable-error-code attr-defined
 
       - name: Run Tests
-        run: pytest --cov=do_data_utils tests/
+        run: uv run pytest --cov=do_data_utils tests/
 
       - name: Build release distributions
         if: ${{ success() }}
-        run: |
-          # NOTE: put your own distribution build steps here.
-          python -m pip install setuptools wheel twine
-          python setup.py sdist bdist_wheel
+        run: uv build
 
 
       - name: Publish to PyPI
         if: ${{ success() }}
-        env:
-          TWINE_USERNAME: __token__
-          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
-        run: twine upload dist/*
+        run: uv publish

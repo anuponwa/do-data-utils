@@ -26,7 +26,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install Dependencies
-        run: pip install -r requirements_dev.txt
+        run: pip install uv==0.5.9
 
       - name: Run Tests
-        run: mypy do_data_utils --ignore-missing-imports --disable-error-code attr-defined
+        run: uv run mypy do_data_utils --ignore-missing-imports --disable-error-code attr-defined
