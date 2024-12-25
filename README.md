@@ -7,6 +7,8 @@
 This package provides you the functionalities to connect to different cloud sources and data cleaning functions.
 Package repo on PyPI: [do-data-utils - PyPI](https://pypi.org/project/do-data-utils/)
 
+**For a full list of functions, see the [overview documentation](https://github.com/anuponwa/do-data-utils/blob/main/docs/overview.md).**
+
 ## Installation
 
 ### Commands
@@ -17,16 +19,7 @@ pip install do-data-utils
 ```
 You can install a specific version, for example,
 ```bash
-pip install do-data-utils==2.6.0
-```
-
-### Install in requirements.txt
-
-You can also put this source in the `requirements.txt`.
-```python
-# requirements.txt
-
-do-data-utils==2.6.0
+pip install do-data-utils==2.7.0
 ```
 
 ## Available Subpackages
@@ -140,6 +133,7 @@ query = 'select * from datadev.dsplayground.my_table'
 df = databricks_to_df(query, secret, polars=False)
 ```
 
+For more functions, see the [overview documentation](https://github.com/anuponwa/do-data-utils/blob/main/docs/overview.md).
 
 ### Path utils
 
