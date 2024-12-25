@@ -1,5 +1,9 @@
 # Change Log
 
+## 2.7.0
+* Add support for downloading and uploading .csv and .parquet file to/from a DataFrame
+* Add tests
+
 ## 2.6.0
 * Add support for downloading and uploading to Azure blob storage
 * Add tests
@@ -39,8 +43,12 @@
 * `add_project_root(levels_up=1)` function adds higher level directory to sys.path
 
 ## 2.0.0
-* Re-design google_secret functions - the project_id will now be inferred from the given secret
+* Re-design google_secret functions - the `project_id` will now be inferred from the given secret
 * `list_secrets()` function will now return only the names of the secrets (not their full paths)
+
+**Breaking features**
+* Remove `project_id` from functions' argument
+* Re-align some of the functions' arguments
 
 ## 1.2.2
 * Fix version bug
