@@ -1,5 +1,8 @@
 # Change Log
 
+## 2.7.1
+* Fix upload Excel to Sharepoint
+
 ## 2.7.0
 * Add support for downloading and uploading .csv and .parquet file to/from a DataFrame
 * Add tests
