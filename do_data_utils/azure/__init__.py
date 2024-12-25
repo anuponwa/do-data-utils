@@ -11,6 +11,8 @@ from .storage import (
     file_to_azure_storage,
     azure_storage_to_file,
     azure_storage_list_files,
+    df_to_azure_storage,
+    azure_storage_to_df
 )
 
 __all__ = [
@@ -18,4 +20,6 @@ __all__ = [
     "file_to_azure_storage",
     "azure_storage_to_file",
     "azure_storage_list_files",
+    "df_to_azure_storage",
+    "azure_storage_to_df"
 ]
