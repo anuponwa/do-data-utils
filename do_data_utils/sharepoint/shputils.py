@@ -284,13 +284,12 @@ def df_to_sharepoint(
 
     elif file_name.endswith(".xlsx"):
         io_output = io.BytesIO()  # Define the output IO
-        writer = pd.ExcelWriter(io_output)  # and the writer
 
-        with pd.ExcelWriter(io_output):
+        with pd.ExcelWriter(io_output) as writer:
             df.to_excel(writer, index=False, **kwargs)
 
         io_output.seek(0)  # Reset the cursor to the beginning (now, this is a file-like object)
-        file_content = io_output.read() # Read the content to a variable
+        file_content = io_output.read() # Read the content to a variable as bytes
 
     # Upload the file content
     bytes_to_sharepoint(file_content, site, sharepoint_dir, file_name, access_token)
