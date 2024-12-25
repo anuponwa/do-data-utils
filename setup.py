@@ -11,7 +11,7 @@ setup(
     long_description_content_type="text/markdown",
     packages=find_packages(),
     install_requires=[
-        "azure-storage-blob~=12.24.0",
+        "azure-storage-file-datalake~=12.18.0",
         "databricks-sdk~=0.36.0",
         "databricks-sql-connector~=3.6.0",
         "google~=3.0.0",

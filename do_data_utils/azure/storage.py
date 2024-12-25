@@ -1,5 +1,6 @@
 # from azure.identity import DefaultAzureCredential
-from azure.storage.blob import BlobServiceClient, ContainerClient
+from azure.identity import ClientSecretCredential
+from azure.storage.filedatalake import DataLakeServiceClient
 import io
 import pandas as pd
 import polars as pl
@@ -18,25 +19,25 @@ from typing import Union
 # blob_service_client = BlobServiceClient(account_url=account_url, credential=credential)
 
 
-def initialize_storage_account(secret: dict) -> str:
-    """Returns the connection string for Azure Blob Storage."""
+def get_service_client(secret: dict) -> DataLakeServiceClient:
+    """Initializes and returns a DataLakeServiceClient using Azure AD credentials."""
 
     try:
-        storage_account = secret["accountName"]
-        storage_account_key = secret["key"]
-
-        # Format the connection string
-        blob_connection_string = (
-            f"DefaultEndpointsProtocol=https;"
-            f"AccountName={storage_account};"
-            f"AccountKey={storage_account_key};"
-            f"EndpointSuffix=core.windows.net"
+        cred = ClientSecretCredential(
+            tenant_id=secret["tenant_id"],
+            client_id=secret["client_id"],
+            client_secret=secret["client_secret"],
         )
-        return blob_connection_string
+
+        service_client = DataLakeServiceClient(
+            account_url=f"https://{secret['storage_account']}.dfs.core.windows.net",
+            credential=cred,
+        )
+        return service_client
 
     except KeyError:
         raise KeyError(
-            "The secret must have the following keys: `accountName` and `key`."
+            "The secret must contain `tenant_id`, `client_id`, `client_secret`, and `storage_account` keys."
         )
 
     except Exception as e:
@@ -46,52 +47,37 @@ def initialize_storage_account(secret: dict) -> str:
 def io_to_azure_storage(
     buffer,
     container_name: str,
-    dest_blob_path: str,
-    dest_file_name: str,
+    dest_file_path: str,
     secret: dict,
     overwrite: bool = True,
 ) -> None:
     """Uploads an in-memory buffer to Azure Blob Storage."""
 
-    blob_connection_string = initialize_storage_account(secret)
-    blob_service_client = BlobServiceClient.from_connection_string(
-        blob_connection_string
-    )
+    service_client = get_service_client(secret)
 
-    if dest_blob_path.endswith("/"):  # Remove trailing slash
-        dest_blob_path = dest_blob_path[:-1]
-
-    blob_client = blob_service_client.get_blob_client(
-        container=container_name, blob=f"{dest_blob_path}/{dest_file_name}".lstrip("/")
+    file_client = service_client.get_file_client(
+        file_system=container_name, file_path=dest_file_path.lstrip("/")
     )
 
     buffer.seek(0)  # Reset buffer position
-    blob_client.upload_blob(buffer, overwrite=overwrite)
+    file_client.upload_data(buffer, overwrite=overwrite)
 
-    print(
-        f"Uploaded to Azure Storage: {container_name}/{dest_blob_path}/{dest_file_name}"
-    )
+    print(f"Uploaded to Azure Storage: {container_name}/{dest_file_path}")
 
 
 def azure_storage_to_io(
-    container_name: str, src_blob_path: str, src_file_name: str, secret: dict
+    container_name: str, file_path: str, secret: dict
 ) -> io.BytesIO:
     """Downloads a blob into an in-memory buffer."""
 
-    blob_connection_string = initialize_storage_account(secret)
-    blob_service_client = BlobServiceClient.from_connection_string(
-        blob_connection_string
-    )
+    service_client = get_service_client(secret)
 
-    if src_blob_path.endswith("/"):  # Remove trailing slash
-        src_blob_path = src_blob_path[:-1]
-
-    blob_client = blob_service_client.get_blob_client(
-        container=container_name, blob=f"{src_blob_path}/{src_file_name}".lstrip("/")
+    file_client = service_client.get_file_client(
+        file_system=container_name, file_path=file_path.lstrip("/")
     )
 
     buffer = io.BytesIO()
-    blob_data = blob_client.download_blob()
+    blob_data = file_client.download_file()
     buffer.write(blob_data.readall())
     buffer.seek(0)  # Reset buffer position for reading
     return buffer
@@ -100,8 +86,7 @@ def azure_storage_to_io(
 def file_to_azure_storage(
     src_file_path: str,
     container_name: str,
-    dest_blob_path: str,
-    dest_file_name: str,
+    dest_file_path: str,
     secret: dict,
     overwrite: bool = True,
 ) -> None:
@@ -113,12 +98,15 @@ def file_to_azure_storage(
 
         container_name (str): Azure storage container name.
 
-        dest_blob_path (str): Destination blob (dir) path.
-
-        dest_file_name (str): Destination file name.
+        dest_file_path (str): Destination file path.
 
         secret (dict): Secret dictionary.
-            Example: `{"accountName": "some-account", "key": "some-key"}`
+            Example: {
+                "tenant_id": "your-tenant-id",
+                "client_id": "your-client-id",
+                "client_secret": "your-client-secret",
+                "storage_account": "your-storage-account"
+            }
 
         overwrite (bool, optional): Whether or not to overwrite existing file. Defaults to `True`.
 
@@ -129,34 +117,27 @@ def file_to_azure_storage(
     Example
     -------
         file_to_azure_storage(
-            "test_file.txt", "test_container", "your/path", "file.txt", mock_secret
+            "test_file.txt", "test_container", "your/path/to/test_file.txt", mock_secret
         )
     """
 
-    blob_connection_string = initialize_storage_account(secret)
-    blob_service_client = BlobServiceClient.from_connection_string(
-        blob_connection_string
-    )
-    if dest_blob_path.endswith("/"):  # Remove trailing slash
-        dest_blob_path = dest_blob_path[:-1]
+    service_client = get_service_client(secret)
 
-    blob_client = blob_service_client.get_blob_client(
-        container=container_name,
-        blob=f"{dest_blob_path}/{dest_file_name}".lstrip("/"),
+    file_client = service_client.get_file_client(
+        file_system=container_name, file_path=dest_file_path.lstrip("/")
     )
 
     with open(src_file_path, "rb") as file:
-        blob_client.upload_blob(file, overwrite=overwrite)
+        file_client.upload_data(file, overwrite=overwrite)
 
     print(
-        f"Uploaded {src_file_path} to Azure Storage: {container_name}/{dest_blob_path}/{dest_file_name}"
+        f"Uploaded {src_file_path} to Azure Storage: {container_name}/{dest_file_path}"
     )
 
 
 def azure_storage_to_file(
     container_name: str,
-    src_blob_path: str,
-    src_file_name: str,
+    file_path: str,
     secret: dict,
 ) -> None:
     """Downloads a file from Azure Blob Storage.
@@ -165,13 +146,16 @@ def azure_storage_to_file(
     ----------
         container_name (str): Azure storage container name.
 
-        src_blob_path (str): Source blob (dir) path.
-
-        src_file_name (str): Source file name.
-            This file name will be used when saving in local.
+        file_path (str): Azure storage file path.
+            Example: `"some/path/to/myfile.csv"`
 
         secret (dict): Secret dictionary.
-            Example: `{"accountName": "some-account", "key": "some-key"}`
+            Example: {
+                "tenant_id": "your-tenant-id",
+                "client_id": "your-client-id",
+                "client_secret": "your-client-secret",
+                "storage_account": "your-storage-account"
+            }
 
     Returns
     -------
@@ -182,34 +166,43 @@ def azure_storage_to_file(
         azure_storage_to_file("test_container", "path/to/file", "file.txt", mock_secret)
     """
 
-    blob_connection_string = initialize_storage_account(secret)
-    blob_service_client = BlobServiceClient.from_connection_string(
-        blob_connection_string
-    )
-    if src_blob_path.endswith("/"):  # Remove trailing slash
-        src_blob_path = src_blob_path[:-1]
+    service_client = get_service_client(secret)
 
-    blob_client = blob_service_client.get_blob_client(
-        container=container_name,
-        blob=f"{src_blob_path}/{src_file_name}".lstrip("/"),
+    file_client = service_client.get_file_client(
+        file_system=container_name,
+        file_path=file_path.lstrip("/"),
     )
 
-    with open(src_file_name, "wb") as file:
-        blob_data = blob_client.download_blob()
+    blob_data = file_client.download_file()
+
+    local_file_name = file_path.split("/")[-1]
+
+    with open(local_file_name, "wb") as file:
         file.write(blob_data.readall())
 
-    print(f"Downloaded blob to local path: {src_file_name}")
+    print(f"Downloaded blob to local path: {local_file_name}")
 
 
-def azure_storage_list_files(container_name: str, secret: dict) -> list[str]:
+def azure_storage_list_files(
+    container_name: str, directory_path: str, secret: dict, files_only: bool = True
+) -> list[str]:
     """Lists all files (blobs) in an Azure Blob Storage container.
 
     Parameters
     ----------
         container_name (str): Azure storage container name.
 
+        directory_path (str): Path to the directory in which you want to list the files.
+
         secret (dict): Secret dictionary.
-            Example: `{"accountName": "some-account", "key": "some-key"}`
+            Example: {
+                "tenant_id": "your-tenant-id",
+                "client_id": "your-client-id",
+                "client_secret": "your-client-secret",
+                "storage_account": "your-storage-account"
+            }
+
+        files_only (bool, optional): Whether or not to return only the files, excluding the directories. Default is `True`
 
     Returns
     -------
@@ -221,19 +214,29 @@ def azure_storage_list_files(container_name: str, secret: dict) -> list[str]:
         azure_storage_list_files("test_container", mock_secret)
     """
 
-    blob_connection_string = initialize_storage_account(secret)
-    container_client = ContainerClient.from_connection_string(
-        blob_connection_string, container_name=container_name
+    service_client = get_service_client(secret)
+    # Get the file system client
+    file_system_client = service_client.get_file_system_client(
+        file_system=container_name
     )
-    blob_list = container_client.list_blobs()
-    return [blob.name for blob in blob_list]
+
+    # Normalize directory path
+    if directory_path and not directory_path.endswith("/"):
+        directory_path += "/"
+
+    # List paths under the specified directory or root
+    paths = file_system_client.get_paths(path=directory_path)
+
+    if files_only:
+        return [path.name for path in paths if not path.is_directory]
+
+    return [path.name for path in paths]
 
 
 def df_to_azure_storage(
     df: pd.DataFrame,
     container_name: str,
-    dest_blob_path: str,
-    dest_file_name: str,
+    dest_file_path: str,
     secret: dict,
     overwrite: bool = True,
     **kwargs,
@@ -246,12 +249,15 @@ def df_to_azure_storage(
 
         container_name (str): Azure storage container name.
 
-        dest_blob_path (str): Destination blob (dir) path.
-
-        dest_file_name (str): Destination file name.
+        dest_file_path (str): Destination file name, including the full path.
 
         secret (dict): Secret dictionary.
-            Example: `{"accountName": "some-account", "key": "some-key"}`
+            Example: {
+                "tenant_id": "your-tenant-id",
+                "client_id": "your-client-id",
+                "client_secret": "your-client-secret",
+                "storage_account": "your-storage-account"
+            }
 
         overwrite (bool, optional): Whether or not to overwrite existing file. Defaults to `True`.
 
@@ -267,7 +273,7 @@ def df_to_azure_storage(
     """
 
     # Determine format based on file extension
-    ext = dest_file_name.split(".")[-1]
+    ext = dest_file_path.split(".")[-1]
 
     if ext == "parquet":
         buffer: Union[io.BytesIO, io.StringIO] = io.BytesIO()
@@ -281,8 +287,7 @@ def df_to_azure_storage(
     io_to_azure_storage(
         buffer=buffer,
         container_name=container_name,
-        dest_blob_path=dest_blob_path,
-        dest_file_name=dest_file_name,
+        dest_file_path=dest_file_path,
         secret=secret,
         overwrite=overwrite,
     )
@@ -290,27 +295,30 @@ def df_to_azure_storage(
 
 def azure_storage_to_df(
     container_name: str,
-    src_blob_path: str,
-    src_file_name: str,
+    file_path: str,
     secret: dict,
     polars: bool = False,
     **kwargs,
 ):
     """Downloads a blob from Azure Blob Storage and converts it to a DataFrame.
-    
+
     Parameters
     ----------
         container_name (str): Azure storage container name.
 
-        src_blob_path (str): Source blob (dir) path.
-
-        src_file_name (str): Source file name.
-            This file name will be used when saving in local.
+        file_path (str): Full path to file in Azure storage.
 
         secret (dict): Secret dictionary.
-            Example: `{"accountName": "some-account", "key": "some-key"}`
+            Example: {
+                "tenant_id": "your-tenant-id",
+                "client_id": "your-client-id",
+                "client_secret": "your-client-secret",
+                "storage_account": "your-storage-account"
+            }
 
         polars (bool): Whether or not to return a polars DataFrame.
+
+        **kwargs: Other parameters to read the csv or parquet file.
 
     Returns
     -------
@@ -318,19 +326,18 @@ def azure_storage_to_df(
 
     Example
     -------
-        azure_storage_to_df("test_container", "path/to/file", "input.csv", mock_secret)
+        azure_storage_to_df("test_container", "path/to/file.csv", mock_secret)
     """
 
     # Use the new `azure_storage_to_io` function
     buffer = azure_storage_to_io(
         container_name=container_name,
-        src_blob_path=src_blob_path,
-        src_file_name=src_file_name,
+        file_path=file_path,
         secret=secret,
     )
 
     # Determine format based on file extension
-    ext = src_file_name.split(".")[-1]
+    ext = file_path.split(".")[-1]
 
     if ext == "parquet":
         if polars:
