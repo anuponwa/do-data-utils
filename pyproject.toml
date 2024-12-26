@@ -1,6 +1,6 @@
 [project]
 name = "do-data-utils"
-version = "3.0.0"
+version = "3.0.0b1"
 description = "Functionalities to interact with Google and Azure, and clean data"
 readme = "README.md"
 requires-python = ">=3.9"
@@ -52,16 +52,13 @@ classifiers = [
 [project.urls]
 Repository = "https://github.com/anuponwa/do-data-utils"
 
-
 [build-system]
-requires = ["setuptools", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
+[tool.hatch.build]
+exclude = ["tests", "tests/**"]
 
-[tool.setuptools.packages.find]
-where = ["."]
-include = ["*"]
-exclude = ["tests*"]
 
 [dependency-groups]
 dev = [

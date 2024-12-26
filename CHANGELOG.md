@@ -1,5 +1,10 @@
 # Change Log
 
+## 3.0.0b1
+* Update to `uv`
+* Get rid of requirements and setuptools
+* Update github actions to `uv`
+
 ## 3.0.0
 **Breaking features**
 * Revamp the Azure Storage related functions
