@@ -26,8 +26,14 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install UV
-        run: pip install uv==0.5.9
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          # Install a specific version of uv.
+          version: "0.5.9"
+
+      - name: uv sync
+        run: uv sync --dev
   
       - name: Run Static Type Checking
         run: uv run mypy do_data_utils --ignore-missing-imports --disable-error-code attr-defined
