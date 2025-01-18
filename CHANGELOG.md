@@ -1,5 +1,11 @@
 # Change Log
 
+## 3.1.0
+* Add `delimiter` parameter in `preprocessing`'s `email` and `phone` modules
+* Add corresponding tests
+* Remove bare except clauses
+* Format some parts of the code
+
 ## 3.0.0b1
 * Update to `uv`
 * Get rid of requirements and setuptools
