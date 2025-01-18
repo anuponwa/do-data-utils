@@ -1,4 +1,4 @@
-EXCLUDE_PHONE_NUMBER_LIST = [
+exclude_phone_number_list = [
     "0000000000",
     "000000000",
     "0800000000",
