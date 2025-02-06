@@ -49,6 +49,16 @@ def test_get_service_client_success(mock_service_client, mock_cred):
     assert result == mock_service_client_instance
 
 
+def test_get_service_client_value_error():
+    # Arrange
+    secret = None
+    storage_account_name = None
+
+    # Act & Assert
+    with pytest.raises(Exception):
+        get_service_client(secret, storage_account_name)
+
+
 def test_get_service_client_key_error():
     # Arrange
     secret = {
@@ -86,7 +96,7 @@ def test_io_to_azure_storage(mock_get_service_client):
     io_to_azure_storage(buffer, container_name, dest_file_path, secret, overwrite)
 
     # Assert
-    mock_get_service_client.assert_called_once_with(secret)
+    mock_get_service_client.assert_called_once_with(secret, storage_account_name=None)
     mock_service_client.get_file_client.assert_called_once_with(
         file_system=container_name, file_path=dest_file_path.lstrip("/")
     )
@@ -121,7 +131,7 @@ def test_azure_storage_to_io(mock_get_service_client):
     result_buffer = azure_storage_to_io(container_name, file_path, secret)
 
     # Assert
-    mock_get_service_client.assert_called_once_with(secret)
+    mock_get_service_client.assert_called_once_with(secret, storage_account_name=None)
     mock_service_client.get_file_client.assert_called_once_with(
         file_system=container_name, file_path=file_path.lstrip("/")
     )
@@ -157,7 +167,7 @@ def test_file_to_azure_storage(mock_file, mock_get_service_client):
     )
 
     # Assert
-    mock_get_service_client.assert_called_once_with(secret)
+    mock_get_service_client.assert_called_once_with(secret, storage_account_name=None)
     mock_service_client.get_file_client.assert_called_once_with(
         file_system=container_name, file_path=dest_file_path.lstrip("/")
     )
@@ -194,7 +204,7 @@ def test_azure_storage_to_file(mock_file, mock_get_service_client):
     azure_storage_to_file(container_name, file_path, secret)
 
     # Assert
-    mock_get_service_client.assert_called_once_with(secret)
+    mock_get_service_client.assert_called_once_with(secret, storage_account_name=None)
     mock_service_client.get_file_client.assert_called_once_with(
         file_system=container_name, file_path=file_path.lstrip("/")
     )
@@ -247,7 +257,7 @@ def test_azure_storage_list_files(mock_get_service_client):
     )
 
     # Assert
-    mock_get_service_client.assert_called_once_with(secret)
+    mock_get_service_client.assert_called_once_with(secret, storage_account_name=None)
     mock_service_client.get_file_system_client.assert_called_once_with(
         file_system=container_name
     )
@@ -290,7 +300,7 @@ def test_azure_storage_list_files_include_directories(mock_get_service_client):
     )
 
     # Assert
-    mock_get_service_client.assert_called_once_with(secret)
+    mock_get_service_client.assert_called_once_with(secret, storage_account_name=None)
     mock_service_client.get_file_system_client.assert_called_once_with(
         file_system=container_name
     )
