@@ -1,5 +1,11 @@
 # Change Log
 
+## 3.2.0
+* Add support for `secret=None` in `azure_storage` module to download and upload to Azure Storage
+* The `DefaultAzureCredential` will be used if `secret` is `None`
+* But it requires `storage_account_name` parameter
+* Add corresponding tests
+
 ## 3.1.0
 * Add `delimiter` parameter in `preprocessing`'s `email` and `phone` modules
 * Add corresponding tests

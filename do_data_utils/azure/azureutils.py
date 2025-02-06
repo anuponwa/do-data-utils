@@ -35,7 +35,8 @@ def authen_databrick_sql(secret: dict):
         host=f"https://{server_nm}", client_id=client_id, client_secret=client_secret
     )
 
-    credential_provider = lambda: oauth_service_principal(config)
+    def credential_provider():
+        return oauth_service_principal(config)
 
     if catalog:
         cnxn = sql.connect(

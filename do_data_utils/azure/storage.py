@@ -1,38 +1,43 @@
-# from azure.identity import DefaultAzureCredential
-from azure.identity import ClientSecretCredential
-from azure.storage.filedatalake import DataLakeServiceClient
 import io
+from typing import Optional, Union
+
 import pandas as pd
 import polars as pl
-from typing import Union
+from azure.core.credentials import TokenCredential  # Base class for credentials
+from azure.identity import ClientSecretCredential, DefaultAzureCredential
+from azure.storage.filedatalake import DataLakeServiceClient
 
 
-# # Automatically authenticate using DefaultAzureCredential
-# credential = DefaultAzureCredential()
-
-# # Azure Storage account information
-# account_url = "https://<storage_account_name>.blob.core.windows.net"
-# container_name = "my-container"
-# blob_name = "folder/file.txt"
-
-# # Initialize BlobServiceClient with Managed Identity
-# blob_service_client = BlobServiceClient(account_url=account_url, credential=credential)
-
-
-def get_service_client(secret: dict) -> DataLakeServiceClient:
+def get_service_client(
+    secret: Optional[dict] = None, storage_account_name: Optional[str] = None
+) -> DataLakeServiceClient:
     """Initializes and returns a DataLakeServiceClient using Azure AD credentials."""
 
     try:
-        cred = ClientSecretCredential(
-            tenant_id=secret["tenant_id"],
-            client_id=secret["client_id"],
-            client_secret=secret["client_secret"],
-        )
+        cred: TokenCredential  # Use the base class for type hinting
+
+        if secret:
+            cred = ClientSecretCredential(
+                tenant_id=secret["tenant_id"],
+                client_id=secret["client_id"],
+                client_secret=secret["client_secret"],
+            )
+
+            storage_account_name = secret["storage_account"]
+
+        elif storage_account_name:
+            cred = DefaultAzureCredential()
+
+        else:
+            raise ValueError(
+                "Either `secret` or `storage_account_name` must not be empty."
+            )
 
         service_client = DataLakeServiceClient(
-            account_url=f"https://{secret['storage_account']}.dfs.core.windows.net",
+            account_url=f"https://{storage_account_name}.dfs.core.windows.net",
             credential=cred,
         )
+
         return service_client
 
     except KeyError:
@@ -48,12 +53,15 @@ def io_to_azure_storage(
     buffer,
     container_name: str,
     dest_file_path: str,
-    secret: dict,
+    secret: Optional[dict] = None,
     overwrite: bool = True,
+    storage_account_name: Optional[str] = None,
 ) -> None:
     """Uploads an in-memory buffer to Azure Blob Storage."""
 
-    service_client = get_service_client(secret)
+    service_client = get_service_client(
+        secret, storage_account_name=storage_account_name
+    )
 
     file_client = service_client.get_file_client(
         file_system=container_name, file_path=dest_file_path.lstrip("/")
@@ -66,11 +74,16 @@ def io_to_azure_storage(
 
 
 def azure_storage_to_io(
-    container_name: str, file_path: str, secret: dict
+    container_name: str,
+    file_path: str,
+    secret: Optional[dict] = None,
+    storage_account_name: Optional[str] = None,
 ) -> io.BytesIO:
     """Downloads a blob into an in-memory buffer."""
 
-    service_client = get_service_client(secret)
+    service_client = get_service_client(
+        secret, storage_account_name=storage_account_name
+    )
 
     file_client = service_client.get_file_client(
         file_system=container_name, file_path=file_path.lstrip("/")
@@ -87,8 +100,9 @@ def file_to_azure_storage(
     src_file_path: str,
     container_name: str,
     dest_file_path: str,
-    secret: dict,
+    secret: Optional[dict] = None,
     overwrite: bool = True,
+    storage_account_name: Optional[str] = None,
 ) -> None:
     """Uploads a file to Azure Blob Storage.
 
@@ -100,7 +114,7 @@ def file_to_azure_storage(
 
         dest_file_path (str): Destination file path.
 
-        secret (dict): Secret dictionary.
+        secret (dict, optional): Secret dictionary. Defaults = None.
             Example: {
                 "tenant_id": "your-tenant-id",
                 "client_id": "your-client-id",
@@ -108,7 +122,9 @@ def file_to_azure_storage(
                 "storage_account": "your-storage-account"
             }
 
-        overwrite (bool, optional): Whether or not to overwrite existing file. Defaults to `True`.
+        overwrite (bool): Whether or not to overwrite existing file. Defaults to `True`.
+
+        storage_account_name (str, optional): Storage account to connect to. Only applies if `secret` is None.
 
     Returns
     -------
@@ -119,9 +135,15 @@ def file_to_azure_storage(
         file_to_azure_storage(
             "test_file.txt", "test_container", "your/path/to/test_file.txt", mock_secret
         )
+
+        file_to_azure_storage(
+            "test_file.txt", "test_container", "your/path/to/test_file.txt", secret=None, storage_account_name="data_env"
+        )
     """
 
-    service_client = get_service_client(secret)
+    service_client = get_service_client(
+        secret, storage_account_name=storage_account_name
+    )
 
     file_client = service_client.get_file_client(
         file_system=container_name, file_path=dest_file_path.lstrip("/")
@@ -138,7 +160,8 @@ def file_to_azure_storage(
 def azure_storage_to_file(
     container_name: str,
     file_path: str,
-    secret: dict,
+    secret: Optional[dict] = None,
+    storage_account_name: Optional[str] = None,
 ) -> None:
     """Downloads a file from Azure Blob Storage.
 
@@ -149,7 +172,7 @@ def azure_storage_to_file(
         file_path (str): Azure storage file path.
             Example: `"some/path/to/myfile.csv"`
 
-        secret (dict): Secret dictionary.
+        secret (dict, optional): Secret dictionary. Defaults = None.
             Example: {
                 "tenant_id": "your-tenant-id",
                 "client_id": "your-client-id",
@@ -157,16 +180,22 @@ def azure_storage_to_file(
                 "storage_account": "your-storage-account"
             }
 
+        storage_account_name (str, optional): Storage account to connect to. Only applies if `secret` is None.
+
     Returns
     -------
         None
 
     Example
     -------
-        azure_storage_to_file("test_container", "path/to/file", "file.txt", mock_secret)
+        azure_storage_to_file("test_container", "path/to/file/file.txt", mock_secret)
+
+        azure_storage_to_file("test_container", "path/to/file/file.txt", storage_account_name="data_env")
     """
 
-    service_client = get_service_client(secret)
+    service_client = get_service_client(
+        secret, storage_account_name=storage_account_name
+    )
 
     file_client = service_client.get_file_client(
         file_system=container_name,
@@ -184,7 +213,11 @@ def azure_storage_to_file(
 
 
 def azure_storage_list_files(
-    container_name: str, directory_path: str, secret: dict, files_only: bool = True
+    container_name: str,
+    directory_path: str,
+    secret: Optional[dict] = None,
+    files_only: bool = True,
+    storage_account_name: Optional[str] = None,
 ) -> list[str]:
     """Lists all files (blobs) in an Azure Blob Storage container.
 
@@ -194,7 +227,7 @@ def azure_storage_list_files(
 
         directory_path (str): Path to the directory in which you want to list the files.
 
-        secret (dict): Secret dictionary.
+        secret (dict, optional): Secret dictionary. Defaults = None.
             Example: {
                 "tenant_id": "your-tenant-id",
                 "client_id": "your-client-id",
@@ -202,7 +235,9 @@ def azure_storage_list_files(
                 "storage_account": "your-storage-account"
             }
 
-        files_only (bool, optional): Whether or not to return only the files, excluding the directories. Default is `True`
+        files_only (bool): Whether or not to return only the files, excluding the directories. Default is `True`
+
+        storage_account_name (str, optional): Storage account to connect to. Only applies if `secret` is None.
 
     Returns
     -------
@@ -211,10 +246,15 @@ def azure_storage_list_files(
 
     Example
     -------
-        azure_storage_list_files("test_container", mock_secret)
+        azure_storage_list_files("test_container", "somepath", mock_secret)
+
+        azure_storage_list_files("test_container", "somepath", storage_account_name="data_env")
     """
 
-    service_client = get_service_client(secret)
+    service_client = get_service_client(
+        secret, storage_account_name=storage_account_name
+    )
+
     # Get the file system client
     file_system_client = service_client.get_file_system_client(
         file_system=container_name
@@ -237,8 +277,9 @@ def df_to_azure_storage(
     df: pd.DataFrame,
     container_name: str,
     dest_file_path: str,
-    secret: dict,
+    secret: Optional[dict] = None,
     overwrite: bool = True,
+    storage_account_name: Optional[str] = None,
     **kwargs,
 ) -> None:
     """Uploads a dataframe to Azure Blob Storage based on file extension.
@@ -251,7 +292,7 @@ def df_to_azure_storage(
 
         dest_file_path (str): Destination file name, including the full path.
 
-        secret (dict): Secret dictionary.
+        secret (dict, optional): Secret dictionary. Defaults = None.
             Example: {
                 "tenant_id": "your-tenant-id",
                 "client_id": "your-client-id",
@@ -259,7 +300,11 @@ def df_to_azure_storage(
                 "storage_account": "your-storage-account"
             }
 
-        overwrite (bool, optional): Whether or not to overwrite existing file. Defaults to `True`.
+        overwrite (bool): Whether or not to overwrite existing file. Defaults to `True`.
+
+        storage_account_name (str, optional): Storage account to connect to. Only applies if `secret` is None.
+
+        **kwargs: Other keyword arguments to the write_*() method from pd.DataFrame.
 
     Returns
     -------
@@ -268,7 +313,11 @@ def df_to_azure_storage(
     Example
     -------
         df_to_azure_storage(
-            my_df, "test_container", "your/path", "output.csv", mock_secret
+            my_df, "test_container", "your/path/output.csv", mock_secret
+        )
+
+        df_to_azure_storage(
+            my_df, "test_container", "your/path/output.csv", secret=None, storage_account_name="data_env"
         )
     """
 
@@ -290,14 +339,16 @@ def df_to_azure_storage(
         dest_file_path=dest_file_path,
         secret=secret,
         overwrite=overwrite,
+        storage_account_name=storage_account_name,
     )
 
 
 def azure_storage_to_df(
     container_name: str,
     file_path: str,
-    secret: dict,
+    secret: Optional[dict],
     polars: bool = False,
+    storage_account_name: Optional[str] = None,
     **kwargs,
 ):
     """Downloads a blob from Azure Blob Storage and converts it to a DataFrame.
@@ -308,7 +359,7 @@ def azure_storage_to_df(
 
         file_path (str): Full path to file in Azure storage.
 
-        secret (dict): Secret dictionary.
+        secret (dict, optional): Secret dictionary. Defaults = None.
             Example: {
                 "tenant_id": "your-tenant-id",
                 "client_id": "your-client-id",
@@ -316,7 +367,9 @@ def azure_storage_to_df(
                 "storage_account": "your-storage-account"
             }
 
-        polars (bool): Whether or not to return a polars DataFrame.
+        polars (bool): Whether or not to return a polars DataFrame. Defaults to False.
+
+        storage_account_name (str, optional): Storage account to connect to. Only applies if `secret` is None.
 
         **kwargs: Other parameters to read the csv or parquet file.
 
@@ -334,6 +387,7 @@ def azure_storage_to_df(
         container_name=container_name,
         file_path=file_path,
         secret=secret,
+        storage_account_name=storage_account_name,
     )
 
     # Determine format based on file extension
