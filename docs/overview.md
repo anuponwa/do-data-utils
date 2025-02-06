@@ -31,11 +31,16 @@ Utilities for interacting with Google Cloud
 Utilities for interacting with Azure
 
 - `databricks_to_df(query: str, secret: dict, polars=False)` – Retrieves the data from Databricks SQL in a DataFrame
-- `file_to_azure_storage(src_file_path: str, container_name: str, dest_file_path: str, secret: dict, overwrite: bool = True)` – Uploads a file to Azure blob storage
-- `azure_storage_to_file(container_name: str, file_path: str, secret: dict)` – Downloads a file from Azure blob storage
-- `azure_storage_list_files(container_name: str, directory_path: str, secret: dict, files_only: bool = True)` – Lists files in Azure storage container
-- `df_to_azure_storage(df: pd.DataFrame, container_name: str, dest_file_path: str, secret: dict, overwrite: bool = True, **kwargs)` – Uploads a DataFrame to Azure blob storage
-- `azure_storage_to_df(container_name: str, file_path: str, secret: dict, polars: bool = False, **kwargs)` – Downloads a csv or parquet file into a DataFrame
+
+- `file_to_azure_storage(src_file_path: str, container_name: str, dest_file_path: str, secret: Optional[dict] = None, overwrite: bool = True, storage_account_name: Optional[str] = None)` – Uploads a file to Azure blob storage
+
+- `azure_storage_to_file(container_name: str, file_path: str, secret: Optional[dict] = None, storage_account_name: Optional[str] = None)` – Downloads a file from Azure blob storage
+
+- `azure_storage_list_files(container_name: str, directory_path: str, secret: Optional[dict] = None, files_only: bool = True, storage_account_name: Optional[str] = None)` – Lists files in Azure storage container
+
+- `df_to_azure_storage(df: pd.DataFrame, container_name: str, dest_file_path: str, secret: Optional[dict] = None, overwrite: bool = True, storage_account_name: Optional[str] = None, **kwargs)` – Uploads a DataFrame to Azure blob storage
+
+- `azure_storage_to_df(container_name: str, file_path: str, secret: Optional[dict] = None, polars: bool = False, storage_account_name: Optional[str] = None, **kwargs)` – Downloads a csv or parquet file into a DataFrame
 
 
 # Subpackage: `pathutils`

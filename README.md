@@ -19,7 +19,7 @@ pip install do-data-utils
 ```
 You can install a specific version, for example,
 ```bash
-pip install do-data-utils==3.1.0
+pip install do-data-utils==3.2.0
 ```
 
 ## Available Subpackages

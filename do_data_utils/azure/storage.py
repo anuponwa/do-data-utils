@@ -1,21 +1,11 @@
-from azure.identity import ClientSecretCredential, DefaultAzureCredential
-from azure.storage.filedatalake import DataLakeServiceClient
 import io
+from typing import Optional, Union
+
 import pandas as pd
 import polars as pl
-from typing import Union, Optional
-
-
-# # Automatically authenticate using DefaultAzureCredential
-# credential = DefaultAzureCredential()
-
-# # Azure Storage account information
-# account_url = "https://<storage_account_name>.blob.core.windows.net"
-# container_name = "my-container"
-# blob_name = "folder/file.txt"
-
-# # Initialize BlobServiceClient with Managed Identity
-# blob_service_client = BlobServiceClient(account_url=account_url, credential=credential)
+from azure.core.credentials import TokenCredential  # Base class for credentials
+from azure.identity import ClientSecretCredential, DefaultAzureCredential
+from azure.storage.filedatalake import DataLakeServiceClient
 
 
 def get_service_client(
@@ -24,6 +14,8 @@ def get_service_client(
     """Initializes and returns a DataLakeServiceClient using Azure AD credentials."""
 
     try:
+        cred: TokenCredential  # Use the base class for type hinting
+
         if secret:
             cred = ClientSecretCredential(
                 tenant_id=secret["tenant_id"],
@@ -130,7 +122,7 @@ def file_to_azure_storage(
                 "storage_account": "your-storage-account"
             }
 
-        overwrite (bool, optional): Whether or not to overwrite existing file. Defaults to `True`.
+        overwrite (bool): Whether or not to overwrite existing file. Defaults to `True`.
 
         storage_account_name (str, optional): Storage account to connect to. Only applies if `secret` is None.
 
@@ -224,7 +216,7 @@ def azure_storage_list_files(
     container_name: str,
     directory_path: str,
     secret: Optional[dict] = None,
-    files_only: Optional[bool] = True,
+    files_only: bool = True,
     storage_account_name: Optional[str] = None,
 ) -> list[str]:
     """Lists all files (blobs) in an Azure Blob Storage container.
@@ -243,7 +235,7 @@ def azure_storage_list_files(
                 "storage_account": "your-storage-account"
             }
 
-        files_only (bool, optional): Whether or not to return only the files, excluding the directories. Default is `True`
+        files_only (bool): Whether or not to return only the files, excluding the directories. Default is `True`
 
         storage_account_name (str, optional): Storage account to connect to. Only applies if `secret` is None.
 
@@ -286,7 +278,7 @@ def df_to_azure_storage(
     container_name: str,
     dest_file_path: str,
     secret: Optional[dict] = None,
-    overwrite: Optional[bool] = True,
+    overwrite: bool = True,
     storage_account_name: Optional[str] = None,
     **kwargs,
 ) -> None:
@@ -308,7 +300,7 @@ def df_to_azure_storage(
                 "storage_account": "your-storage-account"
             }
 
-        overwrite (bool, optional): Whether or not to overwrite existing file. Defaults to `True`.
+        overwrite (bool): Whether or not to overwrite existing file. Defaults to `True`.
 
         storage_account_name (str, optional): Storage account to connect to. Only applies if `secret` is None.
 
@@ -355,7 +347,7 @@ def azure_storage_to_df(
     container_name: str,
     file_path: str,
     secret: Optional[dict],
-    polars: Optional[bool] = False,
+    polars: bool = False,
     storage_account_name: Optional[str] = None,
     **kwargs,
 ):
@@ -375,7 +367,7 @@ def azure_storage_to_df(
                 "storage_account": "your-storage-account"
             }
 
-        polars (bool, optional): Whether or not to return a polars DataFrame. Defaults to False.
+        polars (bool): Whether or not to return a polars DataFrame. Defaults to False.
 
         storage_account_name (str, optional): Storage account to connect to. Only applies if `secret` is None.
 
@@ -395,7 +387,7 @@ def azure_storage_to_df(
         container_name=container_name,
         file_path=file_path,
         secret=secret,
-        storage_account_name=storage_account_name
+        storage_account_name=storage_account_name,
     )
 
     # Determine format based on file extension
