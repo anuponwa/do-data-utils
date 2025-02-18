@@ -1,5 +1,8 @@
 # Change Log
 
+## 3.2.1
+* Fix empty Excel file when uploading to GCS
+
 ## 3.2.0
 * Add support for `secret=None` in `azure_storage` module to download and upload to Azure Storage
 * The `DefaultAzureCredential` will be used if `secret` is `None`

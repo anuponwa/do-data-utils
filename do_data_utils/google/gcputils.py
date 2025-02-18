@@ -122,12 +122,10 @@ def df_to_excel_gcs(
     None
     """
 
-    output = io.BytesIO()
-    writer = pd.ExcelWriter(output)
-    with pd.ExcelWriter(output):
-        df.to_excel(writer, index=False, **kwargs)
+    io_output = io.BytesIO()
+    df.to_excel(io_output, index=False, **kwargs)
 
-    io_to_gcs(output, gcspath, secret=secret)
+    io_to_gcs(io_output, gcspath, secret=secret)
 
 
 def gcs_to_io(gcspath: str, secret: Optional[Union[dict, str]] = None) -> io.BytesIO:
@@ -403,11 +401,11 @@ def df_to_gcs(df, gcspath: str, secret: Optional[Union[dict, str]] = None, **kwa
     if gcspath.endswith(".csv"):
         csv_data = df.to_csv(index=False, **kwargs)
         str_to_gcs(csv_data, gcspath, secret=secret)
-        return f"The file has been successfully uploaded to {gcspath}."
+        print(f"The file has been successfully uploaded to {gcspath}.")
 
     elif gcspath.endswith(".xlsx"):
         df_to_excel_gcs(df, gcspath, secret=secret, **kwargs)
-        return f"The file has been successfully uploaded to {gcspath}."
+        print(f"The file has been successfully uploaded to {gcspath}.")
 
 
 def dict_to_json_gcs(

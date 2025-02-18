@@ -1,6 +1,6 @@
 [project]
 name = "do-data-utils"
-version = "3.2.0"
+version = "3.2.1"
 description = "Functionalities to interact with Google and Azure, and clean data"
 readme = "README.md"
 requires-python = ">=3.9"
