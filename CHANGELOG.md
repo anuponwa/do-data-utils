@@ -1,5 +1,8 @@
 # Change Log
 
+## 3.2.2
+* Add `db-dtypes` dependency to fix `gbq_to_df()` function
+
 ## 3.2.1
 * Fix empty Excel file when uploading to GCS
 
