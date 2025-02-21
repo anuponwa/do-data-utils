@@ -1,6 +1,6 @@
 [project]
 name = "do-data-utils"
-version = "3.2.2"
+version = "3.2.3"
 description = "Functionalities to interact with Google and Azure, and clean data"
 readme = "README.md"
 requires-python = ">=3.9"
@@ -23,10 +23,10 @@ dependencies = [
     "google-cloud-storage~=2.18.2",
     "google-crc32c~=1.6.0",
     "msal~=1.31.1",
-    "pandas~=2.2.3",
-    "polars~=1.11.0",
-    "openpyxl~=3.1.5",
-    "XlsxWriter~=3.2.0",
+    "pandas>=2.0.0",
+    "polars>=0.18.0",
+    "openpyxl>=3.0.0",
+    "XlsxWriter>=3.0.0",
 ]
 license = {file = "LICENSE"}
 classifiers = [

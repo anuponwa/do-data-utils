@@ -395,14 +395,30 @@ wheels = [
 ]
 
 [[package]]
+name = "db-dtypes"
+version = "1.4.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "numpy" },
+    { name = "packaging" },
+    { name = "pandas" },
+    { name = "pyarrow" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/fb/9d/b79951a768dc73e7785d057006143781ec26d91bd456b175c66b031dccdd/db_dtypes-1.4.1.tar.gz", hash = "sha256:36403e252c03c4a5073f67e4315015c7d1f57b2614f56d2037587e0743670fb8", size = 33554 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/68/cd/25215aed98e77685f7d0aa7536eaa51426ea07bcaa187e1907841405c960/db_dtypes-1.4.1-py2.py3-none-any.whl", hash = "sha256:84076e2f952174da3eea16c2692409a0d3ef88d27b68c24ee0c9262513fa26d4", size = 19028 },
+]
+
+[[package]]
 name = "do-data-utils"
-version = "3.2.0"
+version = "3.2.3"
 source = { editable = "." }
 dependencies = [
     { name = "azure-identity" },
     { name = "azure-storage-file-datalake" },
     { name = "databricks-sdk" },
     { name = "databricks-sql-connector" },
+    { name = "db-dtypes" },
     { name = "google" },
     { name = "google-api-core" },
     { name = "google-auth" },
@@ -433,6 +449,7 @@ requires-dist = [
     { name = "azure-storage-file-datalake", specifier = "~=12.18.0" },
     { name = "databricks-sdk", specifier = "~=0.36.0" },
     { name = "databricks-sql-connector", specifier = "~=3.6.0" },
+    { name = "db-dtypes", specifier = "~=1.4.1" },
     { name = "google", specifier = "~=3.0.0" },
     { name = "google-api-core", specifier = "~=2.21.0" },
     { name = "google-auth", specifier = "~=2.35.0" },
@@ -443,10 +460,10 @@ requires-dist = [
     { name = "google-cloud-storage", specifier = "~=2.18.2" },
     { name = "google-crc32c", specifier = "~=1.6.0" },
     { name = "msal", specifier = "~=1.31.1" },
-    { name = "openpyxl", specifier = "~=3.1.5" },
-    { name = "pandas", specifier = "~=2.2.3" },
-    { name = "polars", specifier = "~=1.11.0" },
-    { name = "xlsxwriter", specifier = "~=3.2.0" },
+    { name = "openpyxl", specifier = ">=3.0.0" },
+    { name = "pandas", specifier = ">=2.0.0" },
+    { name = "polars", specifier = ">=0.18.0" },
+    { name = "xlsxwriter", specifier = ">=3.0.0" },
 ]
 
 [package.metadata.requires-dev]

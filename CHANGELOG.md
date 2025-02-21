@@ -1,5 +1,8 @@
 # Change Log
 
+## 3.2.3
+* Fix dependencies, more lenient in `pandas` and `polars` versions.
+
 ## 3.2.2
 * Add `db-dtypes` dependency to fix `gbq_to_df()` function
 
