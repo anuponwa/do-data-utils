@@ -1,5 +1,8 @@
 # Change Log
 
+## 3.2.4
+* Fix bug in `download_folder_gcs()`
+
 ## 3.2.3
 * Fix dependencies, more lenient in `pandas` and `polars` versions.
 

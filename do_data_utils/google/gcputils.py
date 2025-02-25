@@ -560,14 +560,20 @@ def download_folder_gcs(
 
     # Iterate through all files and download them
     for blob in blobs:
+        # If it's a "folder" (trailing slash in GCS), skip
+        if blob.name.endswith("/"):
+            continue
+
         # Create a local file path by joining the local directory with the blob's name
-        local_file_path = os.path.join(local_dir, blob.name[len(dirpath) :])
+        local_file_path = os.path.join(local_dir, blob.name[len(dirpath):])
+
 
         # Ensure the local folder structure exists
         os.makedirs(os.path.dirname(local_file_path), exist_ok=True)
 
         # Download the file
         blob.download_to_filename(local_file_path)
+        print(f"Downloaded {blob.name} to {local_file_path}")
 
 
 def upload_folder_gcs(
