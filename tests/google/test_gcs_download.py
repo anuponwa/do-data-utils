@@ -158,12 +158,14 @@ def test_download_folder_gcs(mock_makedirs, mock_set_gcs_client):
     mock_client.get_bucket.return_value = mock_bucket
     
     # Mock Blob object
+    mock_blob0 = MagicMock()
     mock_blob1 = MagicMock()
     mock_blob2 = MagicMock()
 
+    mock_blob0.name = "folder/"
     mock_blob1.name = "folder/file.txt"
     mock_blob2.name = "folder/sub-folder/file2.txt"
-    mock_bucket.list_blobs.return_value = [mock_blob1, mock_blob2]
+    mock_bucket.list_blobs.return_value = [mock_blob0, mock_blob1, mock_blob2]
 
     gcspath = "gs://bucket/folder/"
     local_dir = "local_dir"
