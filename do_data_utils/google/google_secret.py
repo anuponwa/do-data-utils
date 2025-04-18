@@ -3,7 +3,7 @@ from google.oauth2 import service_account
 import google_crc32c
 import json
 from typing import Optional, Union, Tuple
-from .common import get_secret_info
+from .common import get_secret_info, get_default_project_id
 
 
 # ----------------
@@ -12,7 +12,7 @@ from .common import get_secret_info
 
 
 def set_secret_manager_client(
-    secret: Optional[Union[dict, str]]
+    secret: Optional[Union[dict, str]],
 ) -> Tuple[secretmanager.SecretManagerServiceClient, Optional[dict]]:
     """Gets a secret manager client
 
@@ -36,7 +36,7 @@ def set_secret_manager_client(
     else:
         client = secretmanager.SecretManagerServiceClient()
 
-    if secret == '':
+    if secret == "":
         secret = None
 
     return client, secret
@@ -50,6 +50,7 @@ def set_secret_manager_client(
 def get_secret(
     secret_id: str,
     secret: Optional[Union[dict, str]] = None,
+    project_id: Optional[str] = None,
     as_json: bool = False,
     version_id: Union[str, int] = "latest",
 ) -> Union[str, dict]:
@@ -65,6 +66,16 @@ def get_secret(
         or a path to the secret.json file.
         The secret must have 'project_id' key.
         If None, it uses the default credentials.
+
+    project_id: str | None, default = None
+        Google's project ID for the secret manager.
+        Used only if the `secret` is not provided.
+
+        If a str is provided, it will attempt to use that project_id to get the secret.
+
+        If `None`, the it will attempt to get a project-id from the default using Application Default Credentials (ADC)
+
+        You can authenticate via `gcloud` CLI, i.e., `gcloud auth application-default login`.
 
     as_json: bool, default=False
         Indicates whether or not the secret is in the JSON format
@@ -83,8 +94,12 @@ def get_secret(
 
     if secret and isinstance(secret, dict) and "project_id" in secret:
         project_id = secret["project_id"]
+    elif not project_id:
+        project_id = get_default_project_id()
+    elif isinstance(project_id, str):
+        project_id = project_id
     else:
-        project_id = "-"
+        raise ValueError("`project_id` must be a valid string. Or you can pass in a valid `secret` (credentials JSON) instead.")
 
     # Build the resource name of the secret version.
     name = f"projects/{project_id}/secrets/{secret_id}/versions/{version_id}"
@@ -109,7 +124,10 @@ def get_secret(
     return payload
 
 
-def list_secrets(secret: Optional[Union[dict, str]] = None):
+def list_secrets(
+    secret: Optional[Union[dict, str]] = None,
+    project_id: Optional[str] = None,
+):
     """List all secrets in the given project.
 
     Parameters
@@ -119,6 +137,16 @@ def list_secrets(secret: Optional[Union[dict, str]] = None):
         or a path to the secret.json file.
         The secret must have 'project_id' key.
         If None, it uses the default credentials.
+
+    project_id: str | None, default = None
+        Google's project ID for the secret manager.
+        Used only if the `secret` is not provided.
+
+        If a str is provided, it will attempt to use that project_id to get the secret.
+
+        If `None`, the it will attempt to get a project-id from the default using Application Default Credentials (ADC)
+
+        You can authenticate via `gcloud` CLI, i.e., `gcloud auth application-default login`.
 
     Returns
     -------
@@ -131,8 +159,12 @@ def list_secrets(secret: Optional[Union[dict, str]] = None):
 
     if secret and isinstance(secret, dict) and "project_id" in secret:
         project_id = secret["project_id"]
+    elif not project_id:
+        project_id = get_default_project_id()
+    elif isinstance(project_id, str):
+        project_id = project_id
     else:
-        project_id = "-"
+        raise ValueError("`project_id` must be a valid string. Or you can pass in a valid `secret` (credentials JSON) instead.")
 
     # Build the resource name of the parent project.
     parent = f"projects/{project_id}"

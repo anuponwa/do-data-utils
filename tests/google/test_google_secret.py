@@ -8,19 +8,18 @@ def test_get_secret_no_cred(
     mock_secret_manager_client,
     mock_response_from_secret_access_bytes,
 ):
-
     mock_secret_manager_client.access_secret_version.return_value = (
         mock_response_from_secret_access_bytes
     )
 
     # Act
     secret_id = "some_secret_id"
-    result = get_secret(secret_id, as_json=False)
+    result = get_secret(secret_id, project_id="some-project", as_json=False)
 
     # Assert
     assert result == "mocked_secret_data"
     mock_secret_manager_client.access_secret_version.assert_called_once_with(
-        request={"name": f"projects/-/secrets/{secret_id}/versions/latest"}
+        request={"name": f"projects/some-project/secrets/{secret_id}/versions/latest"}
     )
 
 
@@ -30,7 +29,6 @@ def test_get_secret_bytes(
     secret_json_dict,
     mock_response_from_secret_access_bytes,
 ):
-
     mock_secret_manager_client.access_secret_version.return_value = (
         mock_response_from_secret_access_bytes
     )
@@ -54,7 +52,6 @@ def test_get_secret_json(
     secret_json_dict,
     mock_response_from_secret_access_json,
 ):
-
     mock_secret_manager_client.access_secret_version.return_value = (
         mock_response_from_secret_access_json
     )

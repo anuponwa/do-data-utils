@@ -1,5 +1,8 @@
 # Change Log
 
+## 4.0.0
+* Add support for Google (application) default credentials (ADC) in `list_secrets()` and `get_secret()`
+
 ## 3.2.4
 * Fix bug in `download_folder_gcs()`
 

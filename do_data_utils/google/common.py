@@ -1,6 +1,8 @@
 import json
 from typing import Optional, Union
 
+from google.auth import default
+
 
 def get_secret_info(secret: Union[dict, str]) -> Optional[dict]:
     """Gets the secret info
@@ -28,3 +30,16 @@ def get_secret_info(secret: Union[dict, str]) -> Optional[dict]:
         raise ValueError("`secret` must be a dictionary or a JSON file path.")
 
     return secret_info
+
+
+def get_default_project_id():
+    """Gets default project-id from Application Default Credentials (ADC)
+
+    Returns
+    -------
+    str:
+        project-id from Application Default Credentials (ADC)
+    """
+
+    _, project_id = default()
+    return str(project_id)
