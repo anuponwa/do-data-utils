@@ -86,7 +86,7 @@ def test_list_secrets(
 
     # Act: Call the function under test
     secret = {"project_id": f"{secret_json_dict['project_id']}"}
-    results = list_secrets(secret)
+    results = list_secrets(secret, project_id=secret_json_dict["project_id"])
 
     # Assert: Verify the returned list of secret names
     assert results == ["secret1", "secret2"]
@@ -107,7 +107,7 @@ def test_get_secret_data_corruption(
     )
 
     with pytest.raises(Exception):
-        get_secret(secret_id="test-secret", as_json=False)
+        get_secret(secret_id="test-secret", project_id="-", as_json=False)
 
 
 def test_get_secret_failed_to_parse_json(
@@ -120,4 +120,4 @@ def test_get_secret_failed_to_parse_json(
     )
 
     with pytest.raises(ValueError):
-        get_secret(secret_id="test-secret", as_json=True)
+        get_secret(secret_id="test-secret", project_id="-", as_json=True)
