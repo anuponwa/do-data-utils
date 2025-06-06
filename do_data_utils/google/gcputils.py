@@ -368,8 +368,8 @@ def gcs_to_df(
 # -----------------
 
 
-def df_to_gcs(df, gcspath: str, secret: Optional[Union[dict, str]] = None, **kwargs):
-    """Saves a pandas.DataFrame (to any file type, e.g., .csv or .xlsx) and uploads to GCS
+def df_to_gcs(df: pd.DataFrame, gcspath: str, secret: Optional[Union[dict, str]] = None, **kwargs):
+    """Saves a pandas.DataFrame (to any file type, e.g., .csv, parquet or .xlsx) and uploads to GCS
 
     Parameters
     ----------
@@ -377,7 +377,7 @@ def df_to_gcs(df, gcspath: str, secret: Optional[Union[dict, str]] = None, **kwa
         A DataFrame object.
 
     gcspath: str
-        GCS path that starts with 'gs://' and ends with your preferred file type such as '.csv' or '.xlsx'.
+        GCS path that starts with 'gs://' and ends with your preferred file type such as '.csv', '.parquet' or '.xlsx'.
 
     secret: dict | str | None, default = None
         A secret dictionary used to authenticate the GCS
@@ -395,12 +395,18 @@ def df_to_gcs(df, gcspath: str, secret: Optional[Union[dict, str]] = None, **kwa
     if not gcspath.startswith("gs://"):
         raise ValueError("The path has to start with 'gs://'.")
 
-    if not gcspath.endswith(".csv") and not gcspath.endswith(".xlsx"):
-        raise ValueError("The file name has to be either .csv or .xlsx file.")
+    if not gcspath.endswith(".csv") and not gcspath.endswith(".parquet") and not gcspath.endswith(".xlsx"):
+        raise ValueError("The file name has to be either .csv, .parquet or .xlsx file.")
 
     if gcspath.endswith(".csv"):
         csv_data = df.to_csv(index=False, **kwargs)
         str_to_gcs(csv_data, gcspath, secret=secret)
+        print(f"The file has been successfully uploaded to {gcspath}.")
+
+    elif gcspath.endswith(".parquet"):
+        buffer: Union[io.BytesIO, io.StringIO] = io.BytesIO()
+        df.to_parquet(buffer, index=False, **kwargs)
+        io_to_gcs(buffer, gcspath, secret=secret)
         print(f"The file has been successfully uploaded to {gcspath}.")
 
     elif gcspath.endswith(".xlsx"):
