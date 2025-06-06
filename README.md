@@ -19,7 +19,7 @@ pip install do-data-utils
 ```
 You can install a specific version, for example,
 ```bash
-pip install do-data-utils==3.2.4
+pip install do-data-utils==4.1.0
 ```
 
 ## Available Subpackages
@@ -86,7 +86,7 @@ with open('secrets/secret-manager-key.json', 'r') as f:
     secret_info = json.load(f)
 
 # you can pass in either dict or path to JSON in `secret` argument
-secret = get_secret(secret_id='gcs-secret-id-dev', secret=secret_info, as_json=True) 
+secret = get_secret(secret_id='gcs-secret-id-dev', secret=secret_info, as_json=True)
 
 my_setting_dict = {
     'param1': 'abc',

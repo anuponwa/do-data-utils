@@ -1,5 +1,8 @@
 # Change Log
 
+## 4.1.0
+* Add `.parquet` file support for `df_to_gcs()` function
+
 ## 4.0.0
 * Add support for Google (application) default credentials (ADC) in `list_secrets()` and `get_secret()`
 
