@@ -17,10 +17,6 @@ To install the latest version from `main` branch, use the following command:
 ```bash
 pip install do-data-utils
 ```
-You can install a specific version, for example,
-```bash
-pip install do-data-utils==4.1.0
-```
 
 ## Available Subpackages
 - `google` – Utilities for Google Cloud Platform.

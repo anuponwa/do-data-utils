@@ -1,7 +1,7 @@
-from databricks import sql
-from databricks.sdk.core import Config, oauth_service_principal
 import pandas as pd
 import polars as pl
+from databricks import sql
+from databricks.sdk.core import Config, oauth_service_principal
 
 
 def authen_databrick_sql(secret: dict):
