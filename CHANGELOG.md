@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.2.0
+* Add `azure_storage_delete_path()` function
+* Add `azure_storage_to_dict()` function
+* Support to recursively or non-recursively list files in Azure datalake storage
+* Add `get_secret()` function from Azure keyvault
+
 ## 4.1.0
 * Add `.parquet` file support for `df_to_gcs()` function
 

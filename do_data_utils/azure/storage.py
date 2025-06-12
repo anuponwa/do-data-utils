@@ -1,4 +1,5 @@
 import io
+import json
 from typing import Optional, Union
 
 import pandas as pd
@@ -8,14 +9,14 @@ from azure.identity import ClientSecretCredential, DefaultAzureCredential
 from azure.storage.filedatalake import DataLakeServiceClient
 
 
-def get_service_client(
-    secret: Optional[dict] = None, storage_account_name: Optional[str] = None
-) -> DataLakeServiceClient:
-    """Initializes and returns a DataLakeServiceClient using Azure AD credentials."""
+def get_credentials(
+    secret: Optional[dict] = None,
+) -> TokenCredential:
+    """Initializes and returns Azure Credentials"""
+
+    cred: TokenCredential  # Use the base class for type hinting
 
     try:
-        cred: TokenCredential  # Use the base class for type hinting
-
         if secret:
             cred = ClientSecretCredential(
                 tenant_id=secret["tenant_id"],
@@ -23,11 +24,29 @@ def get_service_client(
                 client_secret=secret["client_secret"],
             )
 
-            storage_account_name = secret["storage_account"]
-
-        elif storage_account_name:
+        else:
             cred = DefaultAzureCredential()
 
+    except KeyError:
+        raise KeyError(
+            "The secret must contain `tenant_id`, `client_id` and `client_secret` keys."
+        )
+
+    return cred
+
+
+def get_service_client(
+    secret: Optional[dict] = None, storage_account_name: Optional[str] = None
+) -> DataLakeServiceClient:
+    """Initializes and returns a DataLakeServiceClient using Azure AD credentials."""
+
+    try:
+        cred = get_credentials(secret=secret)
+
+        if storage_account_name:
+            storage_account_name = storage_account_name
+        elif secret:
+            storage_account_name = secret["storage_account"]
         else:
             raise ValueError(
                 "Either `secret` or `storage_account_name` must not be empty."
@@ -42,7 +61,7 @@ def get_service_client(
 
     except KeyError:
         raise KeyError(
-            "The secret must contain `tenant_id`, `client_id`, `client_secret`, and `storage_account` keys."
+            "The secret must contain `storage_account` key or manually pass in the `storage_account_name`."
         )
 
     except Exception as e:
@@ -218,6 +237,7 @@ def azure_storage_list_files(
     secret: Optional[dict] = None,
     files_only: bool = True,
     storage_account_name: Optional[str] = None,
+    recursive: bool = True,
 ) -> list[str]:
     """Lists all files (blobs) in an Azure Blob Storage container.
 
@@ -238,6 +258,8 @@ def azure_storage_list_files(
         files_only (bool): Whether or not to return only the files, excluding the directories. Default is `True`
 
         storage_account_name (str, optional): Storage account to connect to. Only applies if `secret` is None.
+
+        recursive (bool): Whether or not to search recursively in sub-folders
 
     Returns
     -------
@@ -265,7 +287,7 @@ def azure_storage_list_files(
         directory_path += "/"
 
     # List paths under the specified directory or root
-    paths = file_system_client.get_paths(path=directory_path)
+    paths = file_system_client.get_paths(path=directory_path, recursive=recursive)
 
     if files_only:
         return [path.name for path in paths if not path.is_directory]
@@ -406,3 +428,90 @@ def azure_storage_to_df(
 
     else:
         raise ValueError("The file must be either: `parquet` or `csv`.")
+
+
+def azure_storage_to_dict(
+    container_name: str,
+    file_path: str,
+    secret: Optional[dict],
+    storage_account_name: Optional[str] = None,
+) -> dict:
+    """Download file from Azure Storage to Python dictionary
+
+    Parameters
+    ----------
+        container_name (str): Azure storage container name.
+
+        file_path (str): Full path to file in Azure storage.
+
+        secret (dict, optional): Secret dictionary. Defaults = None.
+            Example: {
+                "tenant_id": "your-tenant-id",
+                "client_id": "your-client-id",
+                "client_secret": "your-client-secret",
+                "storage_account": "your-storage-account"
+            }
+
+        storage_account_name (str, optional): Storage account to connect to. Only applies if `secret` is None.
+
+    Returns
+    -------
+        dict
+    """
+
+    f = azure_storage_to_io(
+        container_name=container_name,
+        file_path=file_path,
+        secret=secret,
+        storage_account_name=storage_account_name,
+    )
+
+    return json.load(f)
+
+
+def azure_storage_delete_path(
+    container_name: str,
+    path: str,
+    secret: Optional[dict] = None,
+    storage_account_name: Optional[str] = None,
+) -> None:
+    """Delete a file or a directory
+
+    Parameters
+    ----------
+        container_name (str): Azure storage container name.
+
+        path (str): A path of a directory or a file in Azure storage.
+
+        secret (dict, optional): Secret dictionary. Defaults = None.
+            Example: {
+                "tenant_id": "your-tenant-id",
+                "client_id": "your-client-id",
+                "client_secret": "your-client-secret",
+                "storage_account": "your-storage-account"
+            }
+
+        storage_account_name (str, optional): Storage account to connect to. Only applies if `secret` is None.
+    """
+
+    service_client = get_service_client(
+        secret, storage_account_name=storage_account_name
+    )
+
+    file_client = service_client.get_file_client(
+        file_system=container_name, file_path=path
+    )
+
+    # Get properties and check if it's a folder
+    props = file_client.get_file_properties()
+    if props["metadata"].get("hdi_isfolder") == "true":
+        # A directory
+        dir_client = service_client.get_directory_client(
+            file_system=container_name, directory=path
+        )
+        dir_client.delete_directory()
+        print(f"Deleted directory: {path}")
+    else:
+        # A file
+        file_client.delete_file()
+        print(f"Deleted file: {path}")

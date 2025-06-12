@@ -10,6 +10,7 @@ from do_data_utils.azure import (
     azure_storage_to_df,
 )
 from do_data_utils.azure.storage import (
+    get_credentials,
     get_service_client,
     io_to_azure_storage,
     azure_storage_to_io,
@@ -69,7 +70,7 @@ def test_get_service_client_key_error():
 
     # Act & Assert
     with pytest.raises(KeyError, match="The secret must contain .* keys."):
-        get_service_client(secret)
+        get_credentials(secret)
 
 
 @patch("do_data_utils.azure.storage.get_service_client")
@@ -261,7 +262,7 @@ def test_azure_storage_list_files(mock_get_service_client):
     mock_service_client.get_file_system_client.assert_called_once_with(
         file_system=container_name
     )
-    mock_file_system_client.get_paths.assert_called_once_with(path=directory_path + "/")
+    mock_file_system_client.get_paths.assert_called_once_with(path=directory_path + "/", recursive=True)
     assert result == ["test/directory/file1.txt", "test/directory/file2.txt"]
 
 
@@ -304,7 +305,7 @@ def test_azure_storage_list_files_include_directories(mock_get_service_client):
     mock_service_client.get_file_system_client.assert_called_once_with(
         file_system=container_name
     )
-    mock_file_system_client.get_paths.assert_called_once_with(path=directory_path + "/")
+    mock_file_system_client.get_paths.assert_called_once_with(path=directory_path + "/", recursive=True)
     assert result == ["test/directory/file1.txt", "test/directory/subdir"]
 
 
