@@ -1,6 +1,6 @@
 import io
 import json
-from typing import Optional, Union
+from typing import Optional
 
 import pandas as pd
 import polars as pl
@@ -347,11 +347,10 @@ def df_to_azure_storage(
     ext = dest_file_path.split(".")[-1]
 
     if ext == "parquet":
-        buffer: Union[io.BytesIO, io.StringIO] = io.BytesIO()
+        buffer: io.BytesIO = io.BytesIO()
         df.to_parquet(buffer, index=False, **kwargs)
     elif ext == "csv":
-        buffer = io.StringIO()
-        df.to_csv(buffer, index=False, **kwargs)
+        buffer = io.BytesIO(df.to_csv(index=False, **kwargs).encode("utf-8"))
     else:
         raise ValueError("The file must be either: `parquet` or `csv`.")
 

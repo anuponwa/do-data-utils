@@ -1,5 +1,8 @@
 # Change Log
 
+## 4.2.1
+* Fix `df_to_azure_storage()` function for csv file type. Now uses `Bytes` object to upload.
+
 ## 4.2.0
 * Add `azure_storage_delete_path()` function
 * Add `azure_storage_to_dict()` function
