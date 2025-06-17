@@ -334,7 +334,7 @@ def test_df_to_azure_storage_csv(mock_io_to_azure_storage):
         "buffer"
     ]  # Access keyword argument 'buffer'
     buffer.seek(0)  # Reset the buffer pointer
-    assert buffer.getvalue() == "col1,col2\n1,3\n2,4\n"
+    assert buffer.getvalue() == b"col1,col2\n1,3\n2,4\n"
 
 
 @patch("do_data_utils.azure.storage.io_to_azure_storage")
